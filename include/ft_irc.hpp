@@ -6,7 +6,7 @@
 /*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:37:13 by user1             #+#    #+#             */
-/*   Updated: 2026/01/22 12:05:07 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/22 16:47:55 by user1            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,10 @@
 #include <utility>
 #include <vector>
 
+bool isLetter(char c);
+bool isDigit(char c);
+bool isSpecial(char c);
+
 typedef enum {
   USER_FLAG,
   SERVICE_FLAG,
@@ -26,6 +30,8 @@ typedef enum {
 
 class IRCChannel;
 
+#define MAX_MESSAGE_LENGTH 512
+#define MAX_NICK_LENGTH 9
 typedef std::set<std::string>::const_iterator setOfStringsIterator;
 
 class IRCClient {
@@ -36,9 +42,20 @@ public:
   virtual ~IRCClient();
   
   const std::string& getNick() const;
-  const std::string& getName() const;
+  bool setNick(const std::string& nick);
+  static bool isValidNick(const std::string& nick);
+
+  const std::string& getUsername() const;
+  bool setUsername(const std::string& username);
+  static bool isValidUsername(const std::string& username);
+
   const std::string& getFullname() const;
+  bool setFullname(const std::string& fullname);
+  static bool isValidFullname(const std::string& fullname);
+  
   int getFd() const;
+  bool setFd(int fd);
+  
   bool checkChannel(const std::string& channelName) const;
   bool addChannel(const std::string& channelName);
   bool delChannel(const std::string& channelName);
@@ -50,10 +67,10 @@ public:
   void clearFlags();
   
 private:
-  std::string nick;
-  std::string name;
-  std::string fullname;
   int fd;
+  std::string nick;
+  std::string username;
+  std::string fullname;
   std::set<std::string> channelNames;
   std::set<FtIRCFlag> flags;
 };
