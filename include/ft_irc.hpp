@@ -6,12 +6,12 @@
 /*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:37:13 by user1             #+#    #+#             */
-/*   Updated: 2026/01/21 16:54:38 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/22 12:05:07 by user1            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_IRC_H
-#define FT_IRC_H
+#ifndef FT_IRC_HPP
+#define FT_IRC_HPP
 #include <set>
 #include <string>
 #include <utility>
@@ -30,6 +30,11 @@ typedef std::set<std::string>::const_iterator setOfStringsIterator;
 
 class IRCClient {
 public:
+  IRCClient();
+  IRCClient(const IRCClient& other);
+  IRCClient& operator=(const IRCClient& other);
+  virtual ~IRCClient();
+  
   const std::string& getNick() const;
   const std::string& getName() const;
   const std::string& getFullname() const;
@@ -37,10 +42,13 @@ public:
   bool checkChannel(const std::string& channelName) const;
   bool addChannel(const std::string& channelName);
   bool delChannel(const std::string& channelName);
-  bool delAllChannels();
+  void clearChannels();
   std::pair<setOfStringsIterator, setOfStringsIterator> getChannelIterators() const;
-  bool checkFlag(FtIRCFlag f);
-
+  bool checkFlag(const FtIRCFlag& f) const;
+  bool setFlag(const FtIRCFlag& f);
+  bool unsetFlag(const FtIRCFlag& f);
+  void clearFlags();
+  
 private:
   std::string nick;
   std::string name;
@@ -54,9 +62,11 @@ class IRCChannel {
 public:
 private:
   std::string name;
-  std::set<IRCClient> users;
+  std::set<std::string> nicks;
 };
 
+/** Commands defined in RFC2812 for client-server messages.
+*/
 typedef enum {
   UNDEF = 0,
   PASS,
@@ -115,6 +125,8 @@ private:
   std::vector<std::string> parameters;
 };
 
+/** Numeric reply and error codes
+*/
 typedef enum {
   RPL_WELCOME         = 001,
   RPL_YOURHOST        = 002,
@@ -199,43 +211,43 @@ typedef enum {
   RPL_VERSION         = 351,
   RPL_WHOREPLY        = 352,
   RPL_NAMREPLY        = 353,
-  RPL_KILLDONE = 361,
-  RPL_CLOSING = 362,
-  RPL_CLOSEEND = 363,
-  RPL_LINKS = 364,
-  RPL_ENDOFLINKS = 365,
-  RPL_ENDOFNAMES = 366,
-  RPL_BANLIST = 367,
-  RPL_ENDOFBANLIST = 368,
-  RPL_ENDOFWHOWAS = 369,
-  RPL_INFO = 371,
-  RPL_MOTD = 372,
-  RPL_INFOSTART = 373,
-  RPL_ENDOFINFO = 374,
-  RPL_MOTDSTART = 375,
-  RPL_ENDOFMOTD = 376,
-  RPL_YOUREOPER = 381,
-  RPL_REHASHING = 382,
-  RPL_YOURESERVICE = 383,
-  RPL_MYPORTIS = 384,
-  RPL_TIME = 391,
-  RPL_USERSSTART = 392,
-  RPL_USERS = 393,
-  RPL_ENDOFUSERS = 394,
-  RPL_NOUSERS = 395,
-  ERR_NOSUCHNICK = 401,
-  ERR_NOSUCHSERVER = 402,
-  ERR_NOSUCHCHANNEL = 403,
+  RPL_KILLDONE        = 361,
+  RPL_CLOSING         = 362,
+  RPL_CLOSEEND        = 363,
+  RPL_LINKS           = 364,
+  RPL_ENDOFLINKS      = 365,
+  RPL_ENDOFNAMES      = 366,
+  RPL_BANLIST         = 367,
+  RPL_ENDOFBANLIST    = 368,
+  RPL_ENDOFWHOWAS     = 369,
+  RPL_INFO            = 371,
+  RPL_MOTD            = 372,
+  RPL_INFOSTART       = 373,
+  RPL_ENDOFINFO       = 374,
+  RPL_MOTDSTART       = 375,
+  RPL_ENDOFMOTD       = 376,
+  RPL_YOUREOPER       = 381,
+  RPL_REHASHING       = 382,
+  RPL_YOURESERVICE    = 383,
+  RPL_MYPORTIS        = 384,
+  RPL_TIME            = 391,
+  RPL_USERSSTART      = 392,
+  RPL_USERS           = 393,
+  RPL_ENDOFUSERS      = 394,
+  RPL_NOUSERS         = 395,
+  ERR_NOSUCHNICK      = 401,
+  ERR_NOSUCHSERVER    = 402,
+  ERR_NOSUCHCHANNEL   = 403,
   ERR_CANNOTSENDTOCHAN = 404,
   ERR_TOOMANYCHANNELS = 405,
-  ERR_WASNOSUCHNICK = 406,
-  ERR_TOOMANYTARGETS = 407,
-  ERR_NOSUCHSERVICE = 408,
-  ERR_NOORIGIN = 409,
-  ERR_NORECIPIENT = 411,
-  ERR_NOTEXTTOSEND = 412,
-  ERR_NOTOPLEVEL = 413,
-  ERR_WILDTOPLEVEL = 414,
+  ERR_WASNOSUCHNICK   = 406,
+  ERR_TOOMANYTARGETS  = 407,
+  ERR_NOSUCHSERVICE   = 408,
+  ERR_NOORIGIN        = 409,
+  ERR_NORECIPIENT     = 411,
+  ERR_NOTEXTTOSEND    = 412,
+  ERR_NOTOPLEVEL      = 413,
+  ERR_WILDTOPLEVEL    = 414,
   ERR_BADMASK = 415,
   ERR_UNKNOWNCOMMAND = 421,
   ERR_NOMOTD = 422,
@@ -278,4 +290,4 @@ typedef enum {
   ERR_UMODEUNKNOWNFLAG = 501,
   ERR_USERSDONTMATCH = 502,
 } IRCReplyCode;
-#endif // FT_IRC_H
+#endif // FT_IRC_HPP
