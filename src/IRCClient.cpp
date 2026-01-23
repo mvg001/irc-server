@@ -6,7 +6,7 @@
 /*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/01/22 16:49:18 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/23 12:10:14 by user1            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,7 @@ bool IRCClient::setUsername(const std::string& username) {
   this->username = username;
   return true;
 }
-/*
-any 7-bit US_ASCII character, except NUL, CR, LF, FF, h/v TABs, and " "
-*/
+
 bool IRCClient::isValidUsername(const std::string &username) {
   if (username.empty() || username.length() >= MAX_MESSAGE_LENGTH)
     return false;
@@ -99,9 +97,7 @@ bool IRCClient::isValidFullname(const std::string &fullname) {
     return false;
   std::string::const_iterator it;
   for (it = fullname.begin(); it != fullname.end(); ++it) {
-      if (*it == '\0' || *it == '\r' || *it == '\n'
-        || *it == '\f' || *it == '\t' || *it == '\v')
-        return false;
+      if (*it == '\0') return false;
     }
   return true;  
 }
@@ -115,7 +111,7 @@ bool IRCClient::setFd(int fd) {
 }
 
 bool IRCClient::checkChannel(const std::string& channelName) const {
-  return channelNames.count(channelName) == 1;
+  return channelNames.count(channelName) != 0;
 }
 
 bool IRCClient::addChannel(const std::string& channelName) {
@@ -123,23 +119,35 @@ bool IRCClient::addChannel(const std::string& channelName) {
 }
 
 bool IRCClient::delChannel(const std::string& channelName) {
-  return channelNames.erase(channelName) == 1;
+  return channelNames.erase(channelName) != 0;
 }
 
 void IRCClient::clearChannels() {
   channelNames.clear();
 }
 
+std::pair<setOfStringsIterator, setOfStringsIterator>
+  IRCClient::getChannelIterators() const {
+  return std::pair<setOfStringsIterator, setOfStringsIterator>(
+    channelNames.begin(), channelNames.end());
+}
+
 bool IRCClient::checkFlag(const FtIRCFlag& f) const {
-  return flags.count(f) == 1;
+  return flags.count(f) != 0;
 }
 
 bool IRCClient::setFlag(const FtIRCFlag& f) {
+  if (f == SERVICE_FLAG && flags.count(USER_FLAG) != 0)
+    return false;
+  if (f == USER_FLAG && flags.count(SERVICE_FLAG) != 0)
+    return false;
+  if (f == OPERATOR_FLAG && flags.count(USER_FLAG) == 0)
+    return false;
   return flags.insert(f).second;
 }
 
 bool IRCClient::unsetFlag(const FtIRCFlag& f) {
-  return flags.erase(f) == 1;
+  return flags.erase(f) != 0;
 }
 
 void IRCClient::clearFlags() {
