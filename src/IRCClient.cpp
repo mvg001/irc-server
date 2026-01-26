@@ -6,11 +6,12 @@
 /*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/01/23 12:10:14 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/26 12:29:58 by user1            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_irc.hpp"
+#include <sstream>
 #include <string>
 
 IRCClient::IRCClient() : fd(-1) {}
@@ -126,9 +127,8 @@ void IRCClient::clearChannels() {
   channelNames.clear();
 }
 
-std::pair<setOfStringsIterator, setOfStringsIterator>
-  IRCClient::getChannelIterators() const {
-  return std::pair<setOfStringsIterator, setOfStringsIterator>(
+pairIterators IRCClient::getChannelIterators() const {
+  return pairIterators(
     channelNames.begin(), channelNames.end());
 }
 
@@ -152,4 +152,31 @@ bool IRCClient::unsetFlag(const FtIRCFlag& f) {
 
 void IRCClient::clearFlags() {
   flags.clear();
+}
+
+std::string IRCClient::toString() const {
+  std::ostringstream buf;
+  buf << "fd=" << fd 
+  << ", nick=\"" << nick 
+  << "\", username=\"" << username
+  << "\", fullname=\"" << fullname
+  << "\", channelNames=[";
+  if (!channelNames.empty()) {
+    pairIterators iterators = getChannelIterators();
+    for (setOfStringsIterator it = iterators.first; 
+      it != iterators.second; ++it) {
+      if (it != iterators.first) buf << ", ";
+      buf << "\"" << *it << "\"";
+    }
+  }
+  buf << "], flags={";
+  if (!flags.empty()) {
+    std::set<FtIRCFlag>::const_iterator it;
+    for (it = flags.begin(); it != flags.end(); ++it) {
+      if (it != flags.begin()) buf << ", ";
+      buf << FtIRCFlagToString(*it);
+    }
+  }
+  buf << "}";
+  return buf.str();
 }

@@ -6,13 +6,14 @@
 /*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:37:13 by user1             #+#    #+#             */
-/*   Updated: 2026/01/23 12:16:30 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/26 12:29:17 by user1            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_IRC_HPP
 #define FT_IRC_HPP
 #include <set>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -23,6 +24,7 @@
 bool isLetter(char c);
 bool isDigit(char c);
 bool isSpecial(char c);
+std::string ft_itoa(int n);
 
 typedef enum {
   USER_FLAG,
@@ -30,8 +32,21 @@ typedef enum {
   OPERATOR_FLAG,
   REGISTERED_FLAG,
 } FtIRCFlag;
-
+const std::string FtIRCFlagToString(FtIRCFlag f)
+{
+    switch (f) {
+        case USER_FLAG:       return "USER_FLAG";
+        case SERVICE_FLAG:    return "SERVICE_FLAG";
+        case OPERATOR_FLAG:   return "OPERATOR_FLAG";
+        case REGISTERED_FLAG: return "REGISTERED_FLAG";
+        default:
+          std::ostringstream oss;
+          oss << "UNKNOWN_FLAG(" << f << ")";
+          return oss.str();
+    }
+}
 typedef std::set<std::string>::const_iterator setOfStringsIterator;
+typedef std::pair<setOfStringsIterator, setOfStringsIterator> pairIterators;
 
 class IRCClient {
 public:
@@ -135,7 +150,7 @@ public:
   * @returns {std::pair<setOfStringsIterator,setOfStringsIterator>}
   * setOfStringsIterator is defined as std::set<std::string>::const_iterator
   */
-  std::pair<setOfStringsIterator, setOfStringsIterator> getChannelIterators() const;
+  pairIterators getChannelIterators() const;
   
   /** Verifies whether a flag is set for this client
   * @param {const FtIRCFlag&} f - flag to be checked
@@ -157,6 +172,9 @@ public:
   /** Clear all client flags */
   void clearFlags();
   
+  /** Generates a text view of the object
+  * @returns {std::string} with the contents of the object */
+  std::string toString() const;
 private:
   int fd;
   std::string nick;
