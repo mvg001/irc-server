@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_irc.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:37:13 by user1             #+#    #+#             */
-/*   Updated: 2026/01/26 12:29:17 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/27 20:58:21 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,21 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <sys/epoll.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <errno.h>
+#include <map>
+#include <cstring>
+
+
+#define GREEN_TEXT "\033[1;32m"
+#define RESET_COLOR "\033[0m"
 
 #define MAX_MESSAGE_LENGTH 512
 #define MAX_NICK_LENGTH 9
@@ -32,25 +47,26 @@ typedef enum {
   OPERATOR_FLAG,
   REGISTERED_FLAG,
 } FtIRCFlag;
-const std::string FtIRCFlagToString(FtIRCFlag f)
-{
-    switch (f) {
-        case USER_FLAG:       return "USER_FLAG";
-        case SERVICE_FLAG:    return "SERVICE_FLAG";
-        case OPERATOR_FLAG:   return "OPERATOR_FLAG";
-        case REGISTERED_FLAG: return "REGISTERED_FLAG";
-        default:
-          std::ostringstream oss;
-          oss << "UNKNOWN_FLAG(" << f << ")";
-          return oss.str();
-    }
-}
+// const std::string FtIRCFlagToString(FtIRCFlag f)
+// {
+//     switch (f) {
+//         case USER_FLAG:       return "USER_FLAG";
+//         case SERVICE_FLAG:    return "SERVICE_FLAG";
+//         case OPERATOR_FLAG:   return "OPERATOR_FLAG";
+//         case REGISTERED_FLAG: return "REGISTERED_FLAG";
+//         default:
+//           std::ostringstream oss;
+//           oss << "UNKNOWN_FLAG(" << f << ")";
+//           return oss.str();
+//     }
+// }
 typedef std::set<std::string>::const_iterator setOfStringsIterator;
 typedef std::pair<setOfStringsIterator, setOfStringsIterator> pairIterators;
 
 class IRCClient {
 public:
   IRCClient();
+	IRCClient(int fd);
   IRCClient(const IRCClient& other);
   IRCClient& operator=(const IRCClient& other);
   virtual ~IRCClient();
@@ -171,6 +187,16 @@ public:
   
   /** Clear all client flags */
   void clearFlags();
+	
+	/** Edit buffer */
+	void addToBuffer(const std::string & s);
+	void addToBuffer(const char * s, size_t n);
+
+	/** Set buffer */
+  void setBuffer(const std::string & s);
+
+	/** Get buffer */
+  std::string & getBuffer();
   
   /** Generates a text view of the object
   * @returns {std::string} with the contents of the object */
@@ -182,6 +208,8 @@ private:
   std::string fullname;
   std::set<std::string> channelNames;
   std::set<FtIRCFlag> flags;
+	
+  std::string buffer;
 };
 
 class IRCChannel {

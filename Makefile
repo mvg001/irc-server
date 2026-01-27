@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: user1 <user1@student.42.fr>                +#+  +:+       +#+         #
+#    By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/11 11:05:02 by user1             #+#    #+#              #
-#    Updated: 2026/01/21 12:43:15 by user1            ###   ########.fr        #
+#    Updated: 2026/01/27 10:19:42 by marcoga2         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
 INCLUDES := $(shell find $(INCLUDE_DIR) -name '*.hpp')
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
-NAME = PmergeMe
+NAME = ircserv
 
 .PHONY: all clean fclean re
 

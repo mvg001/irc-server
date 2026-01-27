@@ -3,18 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/01/26 12:29:58 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/27 21:16:05 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_irc.hpp"
-#include <sstream>
-#include <string>
+#ifndef UTILS_HPP
+#define UTILS_HPP
+
+#include "utils.hpp"
+
+#endif
 
 IRCClient::IRCClient() : fd(-1) {}
+IRCClient::IRCClient(int fd) : fd(fd) {}
 IRCClient::IRCClient(const IRCClient &other):
     fd(other.fd), 
     nick(other.nick), 
@@ -22,6 +26,8 @@ IRCClient::IRCClient(const IRCClient &other):
     fullname(other.fullname),
     channelNames(other.channelNames), 
     flags(other.flags) {}
+	
+
 
 IRCClient &IRCClient::operator=(const IRCClient &other) {
   if (this != &other) {
@@ -154,29 +160,65 @@ void IRCClient::clearFlags() {
   flags.clear();
 }
 
+const std::string FtIRCFlagToString(FtIRCFlag f)
+{
+    switch (f) {
+        case USER_FLAG:       return "USER_FLAG";
+        case SERVICE_FLAG:    return "SERVICE_FLAG";
+        case OPERATOR_FLAG:   return "OPERATOR_FLAG";
+        case REGISTERED_FLAG: return "REGISTERED_FLAG";
+        default:
+          std::ostringstream oss;
+          oss << "UNKNOWN_FLAG(" << f << ")";
+          return oss.str();
+    }
+}
+
 std::string IRCClient::toString() const {
-  std::ostringstream buf;
-  buf << "fd=" << fd 
-  << ", nick=\"" << nick 
-  << "\", username=\"" << username
-  << "\", fullname=\"" << fullname
-  << "\", channelNames=[";
-  if (!channelNames.empty()) {
-    pairIterators iterators = getChannelIterators();
-    for (setOfStringsIterator it = iterators.first; 
-      it != iterators.second; ++it) {
-      if (it != iterators.first) buf << ", ";
-      buf << "\"" << *it << "\"";
-    }
-  }
-  buf << "], flags={";
-  if (!flags.empty()) {
-    std::set<FtIRCFlag>::const_iterator it;
-    for (it = flags.begin(); it != flags.end(); ++it) {
-      if (it != flags.begin()) buf << ", ";
-      buf << FtIRCFlagToString(*it);
-    }
-  }
-  buf << "}";
-  return buf.str();
+	std::ostringstream buf;
+	buf << "fd=" << fd 
+	<< ", nick=\"" << nick 
+	<< "\", username=\"" << username
+	<< "\", fullname=\"" << fullname
+	<< "\", channelNames=[";
+	if (!channelNames.empty()) {
+		pairIterators iterators = getChannelIterators();
+		for (setOfStringsIterator it = iterators.first; 
+		it != iterators.second; ++it) {
+		if (it != iterators.first) buf << ", ";
+		buf << "\"" << *it << "\"";
+		}
+	}
+	buf << "], flags={";
+	if (!flags.empty()) {
+		std::set<FtIRCFlag>::const_iterator it;
+		for (it = flags.begin(); it != flags.end(); ++it) {
+		if (it != flags.begin()) buf << ", ";
+		buf << FtIRCFlagToString(*it);
+		}
+	}
+	buf << "}";
+	return buf.str();
+}
+
+
+void IRCClient::addToBuffer(const std::string & s)
+{
+	buffer += s;
+}
+
+void IRCClient::addToBuffer(const char * s, size_t n)
+{
+	buffer.append(s, n);
+}
+
+void IRCClient::setBuffer(const std::string & s)
+{
+	buffer = s;
+	
+}
+
+std::string & IRCClient::getBuffer()
+{
+	return buffer;
 }

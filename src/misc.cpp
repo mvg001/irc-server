@@ -3,15 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   misc.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 14:22:07 by user1             #+#    #+#             */
-/*   Updated: 2026/01/26 12:22:06 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/27 11:01:54 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_irc.hpp"
-#include <sstream>
+
+#ifndef UTILS_HPP
+#define UTILS_HPP
+
+#include "utils.hpp"
+
+#endif
 
 bool isLetter(char c) {
   return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
@@ -30,4 +35,11 @@ std::string ft_itoa(int n) {
   std::ostringstream os;
   os << n;
   return os.str();    
+}
+
+int ft_atoi(std::string a) {
+  std::istringstream is(a);
+	int n;
+  is >> n;
+  return n;    
 }
