@@ -1,27 +1,31 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/28 15:17:48 by user1             #+#    #+#             */
+/*   Updated: 2026/01/28 15:30:01 by user1            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include <cstdio>
+#include <cstring>
+#include <fcntl.h>
+#include <iostream>
+#include <netinet/in.h>
+#include <string>
+#include <map>
+#include <sys/socket.h>
+#include <unistd.h>
+#include "IRCServ.hpp"
+#include "IRCClient.hpp"
 #include "utils.hpp"
+//#include "IRCMessage.hpp"
+// #include "IRCChannel.hpp"
+// #include "IRCCommand.hpp"
 
-#endif
-// typedef union epoll_data
-// {
-//   void *ptr;
-//   int fd;
-//   uint32_t u32;
-//   uint64_t u64;
-// } epoll_data_t;
-
-// struct epoll_event
-// {
-//   uint32_t events;	/* Epoll events */
-//   epoll_data_t data;	/* User data variable */
-// } __EPOLL_PACKED;
-
-void parse_and_exec(std::string & s)
-{
-	IRCMessage msg();
-}
 
 void close_client(int fd, int epoll_fd, std::map<int, IRCClient> &clients)
 {
@@ -141,7 +145,6 @@ void process_client_buffer(int fd, std::map<int, IRCClient> &clients)
 		//
 		//
 		printf("Socket %d dice: %s%s%s\n", fd, GREEN_TEXT, message.c_str(), RESET_COLOR);
-		parse_and_exec(message);
 		//
 		//
 		//
@@ -216,11 +219,17 @@ int setup_server(IRCServ &server, int server_number)
 
 int main(int ac, char **av)
 {
-	if (ac != 2)
-		return (printf("Arguments must be at least one: the port to mount the server\n"), 1);
+	if (ac != 2) {
+		std::cerr << "Arguments must be at least one: the port to mount the server" << std::endl;
+		return (1);
+	}
 	IRCServ server = IRCServ();
-	int a = 1;
-	if (setup_server(server, ft_atoi(av[1])) == -1)
+	std::pair<int, bool> pairPort = ft_atoi(av[1]);
+	if (!pairPort.second) {
+		std::cerr << "Invalid server port" << std::endl;
+		return 1;
+	}
+	if (setup_server(server, pairPort.first) == -1)
 		return 1;
 
 	while (true)

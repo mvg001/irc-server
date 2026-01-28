@@ -3,22 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 11:45:36 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/01/28 15:33:34 by user1            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILS_HPP
-#define UTILS_HPP
 
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include "IRCClient.hpp"
+#include "IRCMessage.hpp"
 #include "utils.hpp"
 
-#endif
-
 IRCClient::IRCClient() : fd(-1) {}
-IRCClient::IRCClient(int fd) : fd(fd) {}
+IRCClient::IRCClient(int fd) : fd(fd) { 
+  if (fd < 0) throw std::invalid_argument("invalid file descriptor");
+}
 IRCClient::IRCClient(const IRCClient &other):
     fd(other.fd), 
     nick(other.nick), 
@@ -26,8 +29,6 @@ IRCClient::IRCClient(const IRCClient &other):
     fullname(other.fullname),
     channelNames(other.channelNames), 
     flags(other.flags) {}
-	
-
 
 IRCClient &IRCClient::operator=(const IRCClient &other) {
   if (this != &other) {
@@ -60,13 +61,13 @@ bool IRCClient::setNick(const std::string& nick) {
 
 bool IRCClient::isValidNick(const std::string &nick) {
   if (nick.empty() || nick.length() > MAX_NICK_LENGTH) return false;
-  if (!isLetter(nick.at(0))) return false;
-  if (!isSpecial(nick.at(0))) return false;
+  if (!ft_isLetter(nick.at(0))) return false;
+  if (!ft_isSpecial(nick.at(0))) return false;
   std::string::const_iterator it;
   for (it = ++(nick.begin()); it != nick.end(); ++it) {
-    if (isLetter(*it)) continue;
-    if (isDigit(*it)) continue;
-    if (isSpecial(*it)) continue;
+    if (ft_isLetter(*it)) continue;
+    if (ft_isDigit(*it)) continue;
+    if (ft_isSpecial(*it)) continue;
     if (*it == '-') continue;
     return false;
   }
@@ -143,12 +144,20 @@ bool IRCClient::checkFlag(const FtIRCFlag& f) const {
 }
 
 bool IRCClient::setFlag(const FtIRCFlag& f) {
-  if (f == SERVICE_FLAG && flags.count(USER_FLAG) != 0)
+  if (f == PASS_FLAG)
+    return flags.insert(f).second;
+  if (!checkFlag(PASS_FLAG))
     return false;
-  if (f == USER_FLAG && flags.count(SERVICE_FLAG) != 0)
+  if (f == USER_FLAG && checkFlag(SERVICE_FLAG))
     return false;
-  if (f == OPERATOR_FLAG && flags.count(USER_FLAG) == 0)
+  if (f == SERVICE_FLAG && checkFlag(USER_FLAG))
     return false;
+  if (f == OPERATOR_FLAG && !checkFlag(USER_FLAG))
+    return false;
+  if (f == REGISTERED_FLAG) {
+    if (!checkFlag(USER_FLAG) || !checkFlag(SERVICE_FLAG))
+      return false;
+  }
   return flags.insert(f).second;
 }
 
@@ -160,126 +169,66 @@ void IRCClient::clearFlags() {
   flags.clear();
 }
 
-const std::string FtIRCFlagToString(FtIRCFlag f)
+const std::string FtIRCFlagToString(FtIRCFlag flag)
 {
-    switch (f) {
+    switch (flag) {
+        case PASS_FLAG:       return "PASS_FLAG";
+        case NICK_FLAG:       return "NICK_FLAG";
         case USER_FLAG:       return "USER_FLAG";
         case SERVICE_FLAG:    return "SERVICE_FLAG";
         case OPERATOR_FLAG:   return "OPERATOR_FLAG";
         case REGISTERED_FLAG: return "REGISTERED_FLAG";
         default:
           std::ostringstream oss;
-          oss << "UNKNOWN_FLAG(" << f << ")";
+          oss << "UNKNOWN_FLAG(" << flag << ")";
           return oss.str();
     }
 }
 
 std::string IRCClient::toString() const {
-	std::ostringstream buf;
-	buf << "fd=" << fd 
-	<< ", nick=\"" << nick 
-	<< "\", username=\"" << username
-	<< "\", fullname=\"" << fullname
-	<< "\", channelNames=[";
-	if (!channelNames.empty()) {
-		pairIterators iterators = getChannelIterators();
-		for (setOfStringsIterator it = iterators.first; 
-		it != iterators.second; ++it) {
-		if (it != iterators.first) buf << ", ";
-		buf << "\"" << *it << "\"";
-		}
-	}
-	buf << "], flags={";
-	if (!flags.empty()) {
-		std::set<FtIRCFlag>::const_iterator it;
-		for (it = flags.begin(); it != flags.end(); ++it) {
-		if (it != flags.begin()) buf << ", ";
-		buf << FtIRCFlagToString(*it);
-		}
-	}
-	buf << "}";
-	return buf.str();
+  std::ostringstream buf;
+  buf << "fd=" << fd 
+  << ", nick=\"" << nick 
+  << "\", username=\"" << username
+  << "\", fullname=\"" << fullname
+  << "\", channelNames=[";
+  if (!channelNames.empty()) {
+    pairIterators iterators = getChannelIterators();
+    for (setOfStringsIterator it = iterators.first; 
+      it != iterators.second; ++it) {
+      if (it != iterators.first) buf << ", ";
+      buf << "\"" << *it << "\"";
+    }
+  }
+  buf << "], flags={";
+  if (!flags.empty()) {
+    std::set<FtIRCFlag>::const_iterator it;
+    for (it = flags.begin(); it != flags.end(); ++it) {
+      if (it != flags.begin()) buf << ", ";
+      buf << FtIRCFlagToString(*it);
+    }
+  }
+  buf << "}";
+  return buf.str();
 }
-
 
 void IRCClient::addToBuffer(const std::string & s)
 {
-	buffer += s;
+  buffer += s;
 }
 
 void IRCClient::addToBuffer(const char * s, size_t n)
 {
-	buffer.append(s, n);
+  buffer.append(s, n);
 }
 
 void IRCClient::setBuffer(const std::string & s)
 {
-	buffer = s;
-	
+  buffer = s;
+
 }
 
 std::string & IRCClient::getBuffer()
 {
-	return buffer;
-}
-
-
-IRCMessage::IRCMessage(const std::string & s)
-{
-	// IRCCommands command;
-	// std::string prefix;
-	// std::vector<std::string> parameters;
-	if (s.find("NICK", 0, 4))
-	{
-		command = NICK;
-	}
-}
-
-
-
-
-
-
-
-//////IRCServ
-
-
-IRCServ::IRCServ() : listening_socket(0), epoll_fd(0) {}
-				
-// Getter and Setter for listening_socket
-int & IRCServ::getListeningSocket() {
-		return listening_socket;
-}
-void IRCServ::setListeningSocket(int socket) {
-		listening_socket = socket;
-}
-
-// Getter and Setter for epoll_fd
-int & IRCServ::getEpollFd() {
-		return epoll_fd;
-}
-void IRCServ::setEpollFd(int fd) {
-		epoll_fd = fd;
-}
-
-// Getter and Setter for clients
-const std::map<int, IRCClient>& IRCServ::getClients() const {
-		return clients;
-}
-std::map<int, IRCClient>& IRCServ::getClients() {
-		return clients;
-}
-void IRCServ::setClients(const std::map<int, IRCClient>& newClients) {
-		clients = newClients;
-}
-
-// Getter and Setter for events
-struct epoll_event* IRCServ::getEvents() {
-		return events;
-}
-const struct epoll_event* IRCServ::getEvents() const {
-		return events;
-}
-void IRCServ::setEvent(int fd, epoll_event event) {
-				events[fd] = event;
+  return buffer;
 }

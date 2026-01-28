@@ -1,27 +1,13 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.hpp                                          :+:      :+:    :+:   */
+/*   IRCChannel.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/28 15:05:14 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:14:27 by user1            ###   ########.fr       */
+/*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
+/*   Updated: 2026/01/28 15:12:18 by user1            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILS_HPP
-#define UTILS_HPP
-
-#include <string>
-
-#define GREEN_TEXT "\033[1;32m"
-#define RESET_COLOR "\033[0m"
-
-bool ft_isLetter(char c);
-bool ft_isDigit(char c);
-bool ft_isSpecial(char c);
-std::string ft_itoa(int n);
-std::pair<int, bool> ft_atoi(const std::string& str);
-void ft_toUpper(std::string& str);
-#endif
+// TODO
