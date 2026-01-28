@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:37:13 by user1             #+#    #+#             */
-/*   Updated: 2026/01/27 20:58:21 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/01/28 13:01:07 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,11 +272,12 @@ typedef enum {
 
 class IRCMessage {
 public:
-  IRCCommands getCommand() const;
+	IRCMessage(const std::string & s);
+	IRCCommands getCommand() const;
 private:
-  std::string prefix;
-  IRCCommands command;
-  std::vector<std::string> parameters;
+	IRCCommands command;
+	std::string prefix;
+	std::vector<std::string> parameters;
 };
 
 /** Numeric reply and error codes
@@ -445,3 +446,54 @@ typedef enum {
   ERR_USERSDONTMATCH = 502,
 } IRCReplyCode;
 #endif // FT_IRC_HPP
+
+
+class IRCServ {
+public:
+		IRCServ();
+
+    int & getListeningSocket();
+    void setListeningSocket(int socket);
+    int & getEpollFd();
+    void setEpollFd(int fd);
+    const std::map<int, IRCClient>& getClients() const;
+    std::map<int, IRCClient>& getClients();
+    void setClients(const std::map<int, IRCClient>& newClients);
+    struct epoll_event* getEvents();
+    const struct epoll_event* getEvents() const;
+    void setEvent(int fd, epoll_event event);
+
+private:
+    int listening_socket;
+    int epoll_fd;
+    std::map<int, IRCClient> clients;
+    struct epoll_event events[16];
+		std::set<std::string> nicks;
+		std::set<std::string> channels;
+};
+
+class IRCChannel {
+public:
+  IRCChannel();
+	IRCChannel(int fd);
+  IRCChannel(const IRCChannel& other);
+  IRCChannel& operator=(const IRCChannel& other);
+  virtual ~IRCChannel();
+
+
+  const std::string& getName() const;
+  bool setName(const std::string& nick);
+  bool checkUser(const std::string& channelName) const;
+  bool addUser(const std::string& channelName);
+  bool delUser(const std::string& channelName);
+  void clearUsers();
+	
+  void sendMessageThrough();
+
+  /** Generates a text view of the object
+  * @returns {std::string} with the contents of the object */
+  std::string toString() const;
+private:
+  std::string name;
+	std::set<std::string> nicks;
+};

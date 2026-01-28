@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/01/27 21:16:05 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/01/28 11:45:36 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,4 +221,65 @@ void IRCClient::setBuffer(const std::string & s)
 std::string & IRCClient::getBuffer()
 {
 	return buffer;
+}
+
+
+IRCMessage::IRCMessage(const std::string & s)
+{
+	// IRCCommands command;
+	// std::string prefix;
+	// std::vector<std::string> parameters;
+	if (s.find("NICK", 0, 4))
+	{
+		command = NICK;
+	}
+}
+
+
+
+
+
+
+
+//////IRCServ
+
+
+IRCServ::IRCServ() : listening_socket(0), epoll_fd(0) {}
+				
+// Getter and Setter for listening_socket
+int & IRCServ::getListeningSocket() {
+		return listening_socket;
+}
+void IRCServ::setListeningSocket(int socket) {
+		listening_socket = socket;
+}
+
+// Getter and Setter for epoll_fd
+int & IRCServ::getEpollFd() {
+		return epoll_fd;
+}
+void IRCServ::setEpollFd(int fd) {
+		epoll_fd = fd;
+}
+
+// Getter and Setter for clients
+const std::map<int, IRCClient>& IRCServ::getClients() const {
+		return clients;
+}
+std::map<int, IRCClient>& IRCServ::getClients() {
+		return clients;
+}
+void IRCServ::setClients(const std::map<int, IRCClient>& newClients) {
+		clients = newClients;
+}
+
+// Getter and Setter for events
+struct epoll_event* IRCServ::getEvents() {
+		return events;
+}
+const struct epoll_event* IRCServ::getEvents() const {
+		return events;
+}
+void IRCServ::setEvent(int fd, epoll_event event) {
+				events[fd] = event;
 }

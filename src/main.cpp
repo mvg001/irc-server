@@ -18,6 +18,11 @@
 //   epoll_data_t data;	/* User data variable */
 // } __EPOLL_PACKED;
 
+void parse_and_exec(std::string & s)
+{
+	IRCMessage msg();
+}
+
 void close_client(int fd, int epoll_fd, std::map<int, IRCClient> &clients)
 {
 	// Quitar del epoll (ignorar errores)
@@ -136,6 +141,7 @@ void process_client_buffer(int fd, std::map<int, IRCClient> &clients)
 		//
 		//
 		printf("Socket %d dice: %s%s%s\n", fd, GREEN_TEXT, message.c_str(), RESET_COLOR);
+		parse_and_exec(message);
 		//
 		//
 		//
@@ -169,15 +175,15 @@ void handle_line(int fd, int listening_socket, int epoll_fd, std::map<int, IRCCl
 //  7. Crea una instancia epoll para gestionar eventos de I/O asíncronos.
 //  8. Añade el socket de escucha a la instancia epoll para monitorizar eventos de entrada
 //		(conexiones nuevas).
-int setup_server(int *listening_socket, int *epoll_fd, int server_number)
+int setup_server(IRCServ &server, int server_number)
 {
-	*listening_socket = socket(AF_INET, SOCK_STREAM, 0);
-	if (*listening_socket == -1)
+	server.getListeningSocket() = socket(AF_INET, SOCK_STREAM, 0);
+	if (server.getListeningSocket() == -1)
 		return (perror("socket"), -1);
 
 	int opt = 1;
-	if (setsockopt(*listening_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
-		return (close(*listening_socket), perror("setup_server"), -1);
+	if (setsockopt(server.getListeningSocket(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+		return (close(server.getListeningSocket()), perror("setup_server"), -1);
 
 	struct sockaddr_in server_addr;
 	memset(&server_addr, 0, sizeof(server_addr));
@@ -185,24 +191,24 @@ int setup_server(int *listening_socket, int *epoll_fd, int server_number)
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_port = htons(server_number);
 
-	if (bind(*listening_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
-		return (close(*listening_socket), perror("setup_server"), -1);
+	if (bind(server.getListeningSocket(), (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
+		return (close(server.getListeningSocket()), perror("setup_server"), -1);
 
-	if (listen(*listening_socket, 10) == -1)
-		return (close(*listening_socket), perror("setup_server"), -1);
+	if (listen(server.getListeningSocket(), 10) == -1)
+		return (close(server.getListeningSocket()), perror("setup_server"), -1);
 
-	if (fcntl(*listening_socket, F_SETFL, O_NONBLOCK) == -1)
-		return (close(*listening_socket), perror("setup_server"), -1);
+	if (fcntl(server.getListeningSocket(), F_SETFL, O_NONBLOCK) == -1)
+		return (close(server.getListeningSocket()), perror("setup_server"), -1);
 
-	*epoll_fd = epoll_create(1);
-	if (*epoll_fd == -1)
-		return (close(*listening_socket), perror("setup_server"), -1);
+	server.getEpollFd() = epoll_create1(EPOLL_CLOEXEC);
+	if (server.getEpollFd() == -1)
+		return (close(server.getListeningSocket()), perror("setup_server"), -1);
 
 	struct epoll_event ev;
 	ev.events = EPOLLIN;
-	ev.data.fd = *listening_socket;
-	if (epoll_ctl(*epoll_fd, EPOLL_CTL_ADD, *listening_socket, &ev) == -1)
-		close(*epoll_fd);
+	ev.data.fd = server.getListeningSocket();
+	if (epoll_ctl(server.getEpollFd(), EPOLL_CTL_ADD, server.getListeningSocket(), &ev) == -1)
+		close(server.getEpollFd());
 
 	printf("🎧 Servidor escuchando en puerto 6667...\n");
 	return 0;
@@ -212,17 +218,14 @@ int main(int ac, char **av)
 {
 	if (ac != 2)
 		return (printf("Arguments must be at least one: the port to mount the server\n"), 1);
-	printf("atoi dicee: %d\n", ft_atoi(av[1]));
-	int listening_socket, epoll_fd;
-	if (setup_server(&listening_socket, &epoll_fd, ft_atoi(av[1])) == -1)
+	IRCServ server = IRCServ();
+	int a = 1;
+	if (setup_server(server, ft_atoi(av[1])) == -1)
 		return 1;
-
-	std::map<int, IRCClient> clients;
-	struct epoll_event events[16];
 
 	while (true)
 	{
-		int ready = epoll_wait(epoll_fd, events, 16, -1);
+		int ready = epoll_wait(server.getEpollFd(), server.getEvents(), 16, -1);
 		if (ready == -1)
 		{
 			if (errno == EINTR)
@@ -233,12 +236,12 @@ int main(int ac, char **av)
 
 		for (int i = 0; i < ready; ++i)
 		{
-			int fd = events[i].data.fd;
-			handle_line(fd, listening_socket, epoll_fd, clients);
+			int fd = server.getEvents()[i].data.fd;
+			handle_line(fd, server.getListeningSocket(), server.getEpollFd(), server.getClients());
 		}
 	}
 
-	close(epoll_fd);
-	close(listening_socket);
+	close(server.getEpollFd());
+	close(server.getListeningSocket());
 	return 0;
 }
