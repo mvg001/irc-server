@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCMessage.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mvg001 <mvg001@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 11:55:03 by user1             #+#    #+#             */
-/*   Updated: 2026/01/29 15:35:56 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/30 13:40:52 by mvg001           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,17 @@
 
 using std::invalid_argument;
 
-IRCMessage::IRCMessage(const string prefix, const IRCCommand command, 
+/** Parameterized constructor
+*/
+IRCMessage::IRCMessage(const string prefix, 
+  const IRCCommand command, 
   vector<string> params):
   prefix(prefix), command(command), parameters(params) {}
 
 static void checkBasics(string& str) {
   if (str.empty()) 
     throw invalid_argument("empty message");
-  if (str.length() >= MAX_MESSAGE_LENGTH)
+  if (str.length() > MAX_MESSAGE_LENGTH)
     throw invalid_argument("message too large");
   if (str.find('\0') != std::string::npos)
     throw invalid_argument("message contains null char");
@@ -44,6 +47,12 @@ static void checkBasics(string& str) {
   }
 }
 
+/** Parse message string according to grammar from RFC2812,
+  it might throw std::invalid_argument if not valid message.
+  @param {std::string&} message received from a IRC client, 
+    the message can only have at most one sequence "\r\n" and at the end.
+  @returns {IRCMessage} an IRCMessage object.
+*/
 IRCMessage IRCMessage::parse(string& str) {
   checkBasics(str);
   string prefixStr;
@@ -105,7 +114,7 @@ IRCMessage IRCMessage::parse(string& str) {
         state = 8; 
       }
       else if (it == str.end()) {
-        params.push_back(param.substr());
+        params.push_back(param);
         state = 0;
       }
       else {
@@ -115,10 +124,10 @@ IRCMessage IRCMessage::parse(string& str) {
       break; // state == 6
     case 7:
       if (it == str.end()) {
-        params.push_back(param.substr());
+        params.push_back(param);
         state = 0;
       } else if (*it == ' ') {
-        params.push_back(param.substr());
+        params.push_back(param);
         param.clear();
         state = 6;
       }
@@ -126,7 +135,7 @@ IRCMessage IRCMessage::parse(string& str) {
       break; // state == 7
     case 8:
       if (it == str.end()) {
-        params.push_back(param.substr());
+        params.push_back(param);
         state = 0;
       } else param.append(1, *it);
     }
@@ -181,7 +190,7 @@ string IRCMessage::toString() const {
     vector<string>::const_iterator it;
     for (it = pIters.first; it != pIters.second; ++it) {
       if (it != pIters.first) buf << ", ";
-      buf << "\"" << *it << "\"";
+      buf << '"' << *it << '"';
     }
     buf << "]";
     return buf.str();
