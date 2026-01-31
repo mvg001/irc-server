@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:17:48 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:30:01 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/31 12:16:40 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
@@ -178,7 +179,7 @@ void handle_line(int fd, int listening_socket, int epoll_fd, std::map<int, IRCCl
 //  7. Crea una instancia epoll para gestionar eventos de I/O asíncronos.
 //  8. Añade el socket de escucha a la instancia epoll para monitorizar eventos de entrada
 //		(conexiones nuevas).
-int setup_server(IRCServ &server, int server_number)
+int setup_server(IRCServ &server, int listeningPort)
 {
 	server.getListeningSocket() = socket(AF_INET, SOCK_STREAM, 0);
 	if (server.getListeningSocket() == -1)
@@ -192,7 +193,7 @@ int setup_server(IRCServ &server, int server_number)
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = INADDR_ANY;
-	server_addr.sin_port = htons(server_number);
+	server_addr.sin_port = htons(listeningPort);
 
 	if (bind(server.getListeningSocket(), (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
 		return (close(server.getListeningSocket()), perror("setup_server"), -1);
@@ -213,14 +214,15 @@ int setup_server(IRCServ &server, int server_number)
 	if (epoll_ctl(server.getEpollFd(), EPOLL_CTL_ADD, server.getListeningSocket(), &ev) == -1)
 		close(server.getEpollFd());
 
-	printf("🎧 Servidor escuchando en puerto 6667...\n");
+	
+	std::cout << "🎧 Servidor escuchando en puerto " << listeningPort << "..." << std::endl;
 	return 0;
 }
 
 int main(int ac, char **av)
 {
-	if (ac != 2) {
-		std::cerr << "Arguments must be at least one: the port to mount the server" << std::endl;
+	if (ac != 3) {
+		std::cerr << "Usage: ircserver <port> <client_password>" << std::endl;
 		return (1);
 	}
 	IRCServ server = IRCServ();

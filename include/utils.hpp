@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:05:14 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:14:27 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/31 12:16:30 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,4 +24,5 @@ bool ft_isSpecial(char c);
 std::string ft_itoa(int n);
 std::pair<int, bool> ft_atoi(const std::string& str);
 void ft_toUpper(std::string& str);
+const std::string& getLocalHostname();
 #endif
