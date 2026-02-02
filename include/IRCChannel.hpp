@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCChannel.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:11:42 by user1            ###   ########.fr       */
+/*   Updated: 2026/02/02 16:48:28 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 class IRCChannel {
 public:
   IRCChannel();
-	IRCChannel(int fd);
   IRCChannel(const IRCChannel& other);
   IRCChannel& operator=(const IRCChannel& other);
   virtual ~IRCChannel();

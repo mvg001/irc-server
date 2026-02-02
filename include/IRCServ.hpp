@@ -3,37 +3,59 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/01/31 12:16:24 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/02 18:47:04 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef IRCSERV_HPP
 #define IRCSERV_HPP
-#include <map>
-#include <set>
-#include <string>
+
+
 #include <sys/epoll.h>
+#include <cstring>
+#include <map>
+#include <fcntl.h>
+#include <iostream>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <stdexcept> 
+
+#include "IRCServ.hpp"
 #include "IRCClient.hpp"
+#include "utils.hpp"
+#include "IRCClient.hpp"
+#include "IRCMessage.hpp"
+
 
 class IRCServ {
 public:
 		IRCServ();
+		IRCServ::IRCServ(int listening_port);
+		IRCServ::~IRCServ();
 
-    int & getListeningSocket();
-    void setListeningSocket(int socket);
-    void setClientPassword(std::string& password);
-    bool checkClientPassword(std::string& password) const;
-    int & getEpollFd();
-    void setEpollFd(int fd);
-    const std::map<int, IRCClient>& getClients() const;
-    std::map<int, IRCClient>& getClients();
-    void setClients(const std::map<int, IRCClient>& newClients);
-    struct epoll_event* getEvents();
-    const struct epoll_event* getEvents() const;
-    void setEvent(int fd, epoll_event event);
+    int																getListeningSocket() const;
+    void															setListeningSocket(int socket);
+    void															setClientPassword(std::string& password);
+    bool															checkClientPassword(std::string& password) const;
+    int																getEpollFd() const;
+    void															setEpollFd(int fd);
+    const std::map<int, IRCClient>&		getClients() const;
+    std::map<int, IRCClient>&					getClients();
+    void															setClients(const std::map<int, IRCClient>& newClients);
+    struct epoll_event*								getEvents();
+    const struct epoll_event*					getEvents() const;
+    void															setEvent(int fd, epoll_event event);
+
+		void															run();
+		void															process_client_buffer(int fd);
+		void															close_client(int fd);
+		void															accept_new_connection();
+		bool															read_from_client(IRCClient & client);
+
 
 private:
     int listening_socket;
