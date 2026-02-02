@@ -6,11 +6,10 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:17:48 by user1             #+#    #+#             */
-/*   Updated: 2026/01/31 12:16:40 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/01/31 12:59:40 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <climits>
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
