@@ -6,7 +6,7 @@
 /*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:44:00 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:07:56 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/29 13:55:30 by user1            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,25 @@
 #define MAX_MESSAGE_LENGTH 512
 #define MAX_NICK_LENGTH 9
 
+using std::string;
+using std::vector;
+using std::pair;
+typedef pair<vector<string>::const_iterator, vector<string>::const_iterator> vectorIteratorPairType;
 class IRCMessage {
 public:
-  IRCMessage(const std::string prefix, const IRCCommand command, std::vector<std::string> params);
-  static IRCMessage parse(std::string& str);
+  IRCMessage(const string prefix, const IRCCommand command, vector<string> params);
+  static IRCMessage parse(string& str);
   virtual ~IRCMessage();
   IRCMessage(const IRCMessage& other);
-  IRCMessage operator=(const IRCMessage& other);
-  const std::string& getPrefix();
-  std::pair<const std::string::const_iterator,
-    const std::string::const_iterator> getParameters();
+  IRCMessage& operator=(const IRCMessage& other);
+  const string& getPrefix() const;
+  vectorIteratorPairType getParameters() const;
+  vector<string>::size_type getParametersSize() const;
   IRCCommand getCommand() const;
-  std::string toString() const;
+  string toString() const;
 private:
-  std::string prefix;
+  string prefix;
   IRCCommand command;
-  std::vector<std::string> parameters;
+  vector<string> parameters;
 };
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:02:08 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/31 12:16:24 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ public:
 
     int & getListeningSocket();
     void setListeningSocket(int socket);
+    void setClientPassword(std::string& password);
+    bool checkClientPassword(std::string& password) const;
     int & getEpollFd();
     void setEpollFd(int fd);
     const std::map<int, IRCClient>& getClients() const;
@@ -35,6 +37,7 @@ public:
 
 private:
     int listening_socket;
+    std::string clientPassword;
     int epoll_fd;
     std::map<int, IRCClient> clients;
     struct epoll_event events[16];

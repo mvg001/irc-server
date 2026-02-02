@@ -3,17 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 14:22:07 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:13:28 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/31 12:16:44 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils.hpp"
-#include <sstream>
-#include <utility>
+#include <climits>
+#include <cstring>
 #include <limits>
+#include <sstream>
+#include <unistd.h>
+#include <utility>
 
 bool ft_isLetter(char c) {
   return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
@@ -66,4 +69,17 @@ void ft_toUpper(std::string& str) {
     if ('a' <= *it && *it <= 'z')
       *it = (*it - 32);
   }
+}
+
+const std::string& getLocalHostname() {
+  static std::string hostname;
+  if (hostname.empty()) {
+    char name[HOST_NAME_MAX+1];
+    std::memset(name, 0, sizeof(name));
+    if (gethostname(name, sizeof(name)) == 0)
+      hostname = name;
+    else
+      hostname = "Undefined";
+  }
+  return hostname;
 }

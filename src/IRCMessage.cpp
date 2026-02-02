@@ -3,52 +3,63 @@
 /*                                                        :::      ::::::::   */
 /*   IRCMessage.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mvg001 <mvg001@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 11:55:03 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:16:29 by user1            ###   ########.fr       */
+/*   Updated: 2026/01/30 13:40:52 by mvg001           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include <stdexcept>
-#include <string>
-#include <vector>
+#include <sstream>
 
 #include "IRCMessage.hpp"
+#include "IRCCommand.hpp"
 #include "utils.hpp"
 
-IRCMessage::IRCMessage(const std::string prefix, const IRCCommand command, 
-  std::vector<std::string> params):
+using std::invalid_argument;
+
+/** Parameterized constructor
+*/
+IRCMessage::IRCMessage(const string prefix, 
+  const IRCCommand command, 
+  vector<string> params):
   prefix(prefix), command(command), parameters(params) {}
 
-static void checkBasics(std::string& str) {
+static void checkBasics(string& str) {
   if (str.empty()) 
-    throw std::invalid_argument("empty message");
-  if (str.length() >= MAX_MESSAGE_LENGTH)
-    throw std::invalid_argument("message too large");
+    throw invalid_argument("empty message");
+  if (str.length() > MAX_MESSAGE_LENGTH)
+    throw invalid_argument("message too large");
   if (str.find('\0') != std::string::npos)
-    throw std::invalid_argument("message contains null char");
-  std::string::size_type crlfPos = str.rfind("\r\n");
-  if (crlfPos != std::string::npos) { // found crlf
+    throw invalid_argument("message contains null char");
+  string::size_type crlfPos = str.rfind("\r\n");
+  if (crlfPos != string::npos) { // found crlf
     if (str.length() - crlfPos == 2) { // found crlf at end of string
       str.erase(crlfPos); // erase "\r\n" at the end
     } else { // found crlf not at the end of string
-      throw std::invalid_argument("found more than one crlf");
+      throw invalid_argument("found more than one crlf");
     }
-    if (str.find("\r\n") != std::string::npos) { // found crlf in the middle
-      throw std::invalid_argument("found crlf in the middle");
+    if (str.find("\r\n") != string::npos) { // found crlf in the middle
+      throw invalid_argument("found crlf in the middle");
     }
   }
 }
 
-IRCMessage IRCMessage::parse(std::string& str) {
+/** Parse message string according to grammar from RFC2812,
+  it might throw std::invalid_argument if not valid message.
+  @param {std::string&} message received from a IRC client, 
+    the message can only have at most one sequence "\r\n" and at the end.
+  @returns {IRCMessage} an IRCMessage object.
+*/
+IRCMessage IRCMessage::parse(string& str) {
   checkBasics(str);
-  std::string prefixStr;
-  std::string cmdStr;
-  std::string param;
-  std::vector<std::string> params;
-  std::string::const_iterator it = str.begin();
+  string prefixStr;
+  string cmdStr;
+  string param;
+  vector<string> params;
+  string::const_iterator it = str.begin();
   int state = 1;
   while (state > 0) {
     switch (state) {
@@ -103,7 +114,7 @@ IRCMessage IRCMessage::parse(std::string& str) {
         state = 8; 
       }
       else if (it == str.end()) {
-        params.push_back(param.substr());
+        params.push_back(param);
         state = 0;
       }
       else {
@@ -113,10 +124,10 @@ IRCMessage IRCMessage::parse(std::string& str) {
       break; // state == 6
     case 7:
       if (it == str.end()) {
-        params.push_back(param.substr());
+        params.push_back(param);
         state = 0;
       } else if (*it == ' ') {
-        params.push_back(param.substr());
+        params.push_back(param);
         param.clear();
         state = 6;
       }
@@ -124,17 +135,63 @@ IRCMessage IRCMessage::parse(std::string& str) {
       break; // state == 7
     case 8:
       if (it == str.end()) {
-        params.push_back(param.substr());
+        params.push_back(param);
         state = 0;
       } else param.append(1, *it);
     }
     ++it;
   }
-  if (state < 0) throw std::invalid_argument("invalid syntax");
+  if (state < 0) throw invalid_argument("invalid syntax");
   IRCCommand cmd = stringToIRCCommand(cmdStr);
-  if (cmd == UNDEFINED) throw std::invalid_argument("unknown command");
+  if (cmd == UNDEFINED) throw invalid_argument("unknown command");
   return IRCMessage(prefixStr, cmd, params);
 }
 
 IRCMessage::~IRCMessage() {}
 
+IRCMessage::IRCMessage(const IRCMessage& other) {
+  this->prefix = other.prefix;
+  this->command = other.command;
+  this->parameters = other.parameters;
+}
+
+IRCMessage& IRCMessage::operator=(const IRCMessage& other) {
+  if (this == &other) return *this;
+  this->prefix = other.prefix;
+  this->command = other.command;
+  this->parameters = other.parameters;
+  return *this;
+}
+
+const string& IRCMessage::getPrefix() const {
+  return prefix;
+}
+
+vectorIteratorPairType IRCMessage::getParameters() const {
+  return vectorIteratorPairType(
+    parameters.begin(), parameters.end()
+  ); 
+}
+
+vector<string>::size_type IRCMessage::getParametersSize() const {
+  return parameters.size();
+}
+
+IRCCommand IRCMessage::getCommand() const {
+  return command;
+}
+
+string IRCMessage::toString() const {
+  std::ostringstream buf;
+  buf << "prefix=\"" << prefix
+    << "\", command=" << IRCCommandtoString(command)
+    << ", parameters=[";
+    vectorIteratorPairType pIters = getParameters();
+    vector<string>::const_iterator it;
+    for (it = pIters.first; it != pIters.second; ++it) {
+      if (it != pIters.first) buf << ", ";
+      buf << '"' << *it << '"';
+    }
+    buf << "]";
+    return buf.str();
+}
