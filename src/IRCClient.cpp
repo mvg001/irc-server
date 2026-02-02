@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:33:34 by user1            ###   ########.fr       */
+/*   Updated: 2026/02/02 16:04:45 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,11 +193,10 @@ std::string IRCClient::toString() const {
   << "\", fullname=\"" << fullname
   << "\", channelNames=[";
   if (!channelNames.empty()) {
-    pairIterators iterators = getChannelIterators();
-    for (setOfStringsIterator it = iterators.first; 
-      it != iterators.second; ++it) {
-      if (it != iterators.first) buf << ", ";
-      buf << "\"" << *it << "\"";
+    for (setOfStringsIterator it = channelNames.begin(); 
+      it != channelNames.end(); ++it) {
+      if (it != channelNames.begin()) buf << ", ";
+      buf << '"' << *it << '"';
     }
   }
   buf << "], flags={";

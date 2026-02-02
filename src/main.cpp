@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:17:48 by user1             #+#    #+#             */
-/*   Updated: 2026/01/31 12:59:40 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/02 12:27:17 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,15 @@
 #include <fcntl.h>
 #include <iostream>
 #include <netinet/in.h>
+#include <stdexcept>
 #include <string>
 #include <map>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "IRCMessage.hpp"
 #include "IRCServ.hpp"
 #include "IRCClient.hpp"
 #include "utils.hpp"
-//#include "IRCMessage.hpp"
-// #include "IRCChannel.hpp"
-// #include "IRCCommand.hpp"
 
 
 void close_client(int fd, int epoll_fd, std::map<int, IRCClient> &clients)
@@ -138,13 +137,14 @@ void process_client_buffer(int fd, std::map<int, IRCClient> &clients)
 		else
 			buf.erase(0, pos + 1);
 
-		//
-		//
-		//
 		// PARSEO
-		//
-		//
-		printf("Socket %d dice: %s%s%s\n", fd, GREEN_TEXT, message.c_str(), RESET_COLOR);
+		try {
+			IRCMessage ircMsg = IRCMessage::parse(message);
+			std::cout << fd << ": " << ircMsg.toString() << std::endl;
+		} catch (...) {
+			std::cerr << fd << ": Unable to parse message => " << message << std::endl;
+		}
+		// printf("Socket %d dice: %s%s%s\n", fd, GREEN_TEXT, message.c_str(), RESET_COLOR);
 		//
 		//
 		//

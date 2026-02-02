@@ -3,34 +3,38 @@
 /*                                                        :::      ::::::::   */
 /*   IRCChannel.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:11:42 by user1            ###   ########.fr       */
+/*   Updated: 2026/02/02 15:54:05 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef IRCCHANNEL_HPP
 #define IRCCHANNEL_HPP
+#include "IRCMessage.hpp"
+#include "utils.hpp"
 #include <string>
 #include <set>
+
 class IRCChannel {
 public:
   IRCChannel();
-	IRCChannel(int fd);
+	IRCChannel(const std::string& name);
   IRCChannel(const IRCChannel& other);
   IRCChannel& operator=(const IRCChannel& other);
   virtual ~IRCChannel();
 
 
   const std::string& getName() const;
-  bool setName(const std::string& nick);
+  bool setName(const std::string& name);
   bool checkUser(const std::string& channelName) const;
-  bool addUser(const std::string& channelName);
-  bool delUser(const std::string& channelName);
+  bool addUser(const std::string& nick);
+  bool delUser(const std::string& nick);
   void clearUsers();
-	
-  void sendMessageThrough();
+	pairIterators getChannelIterators() const;
+  
+  void sendMessageThrough(IRCMessage& msg) const;
 
   /** Generates a text view of the object
   * @returns {std::string} with the contents of the object */
