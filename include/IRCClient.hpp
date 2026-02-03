@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:36:20 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 20:10:08 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 11:58:56 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #define IRCCLIENT_HPP
 #include <set>
 #include <string>
+#include "utils.hpp"
+
 typedef enum {
   PASS_FLAG,        // after PASS command
   NICK_FLAG,        // after NICK command
@@ -24,8 +26,6 @@ typedef enum {
 } FtIRCFlag;
 
 const std::string FtIRCFlagToString(FtIRCFlag flag);
-typedef std::set<std::string>::const_iterator setOfStringsIterator;
-typedef std::pair<setOfStringsIterator, setOfStringsIterator> pairIterators;
 
 class IRCClient {
 public:

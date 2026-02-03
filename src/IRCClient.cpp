@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 20:12:40 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 12:01:20 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,11 +193,10 @@ std::string IRCClient::toString() const {
   << "\", fullname=\"" << fullname
   << "\", channelNames=[";
   if (!channelNames.empty()) {
-    pairIterators iterators = getChannelIterators();
-    for (setOfStringsIterator it = iterators.first; 
-      it != iterators.second; ++it) {
-      if (it != iterators.first) buf << ", ";
-      buf << "\"" << *it << "\"";
+    for (setOfStringsIterator it = channelNames.begin(); 
+      it != channelNames.end(); ++it) {
+      if (it != channelNames.begin()) buf << ", ";
+      buf << '"' << *it << '"';
     }
   }
   buf << "], flags={";
