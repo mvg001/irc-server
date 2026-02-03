@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 18:47:04 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/02 20:51:48 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <map>
 #include <fcntl.h>
 #include <iostream>
+#include <sstream>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -55,7 +56,13 @@ public:
 		void															close_client(int fd);
 		void															accept_new_connection();
 		bool															read_from_client(IRCClient & client);
+		void															answer_command(IRCMessage & msg, int fd);
+		void 															queue_and_send(int fd, std::string data);
 
+
+		void IRCServ::answer_pass(IRCMessage & msg, int fd);
+		void IRCServ::answer_nick(IRCMessage & msg, int fd);
+		void IRCServ::answer_user(IRCMessage & msg, int fd);
 
 private:
     int listening_socket;

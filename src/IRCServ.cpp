@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 18:57:52 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/02 20:59:46 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,9 +123,10 @@ void IRCServ::run()
 		{
 			if (errno == EINTR)
 				continue;
-			throw std::runtime_error(std::string("Epoll_create1: ")
+			throw std::runtime_error(std::string("Epoll_wait: ")
 			+ strerror(errno));
 		}
+
 		for (int i = 0; i < ready; ++i)
 		{
 			int fd = events[i].data.fd;
@@ -133,14 +134,16 @@ void IRCServ::run()
 				accept_new_connection();
 			else
 			{
+				if (events[i].events & EPOLLOUT)
+					this->queue_and_send(fd, ""); 
 				if (read_from_client(clients[fd]))
-					return close_client(fd);
+					close_client(fd);
 				process_client_buffer(fd);
 			}
 		}
 	}
 }
-
+ 
 void IRCServ::close_client(int fd)
 {
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL) == -1)
@@ -194,9 +197,9 @@ bool IRCServ::read_from_client(IRCClient & client)
 	{
 		ssize_t n = recv(client.getFd(), tmp, sizeof(tmp), 0);
 		if (n > 0)
-			client.addToBuffer(tmp, n);
+			client.addToIbuffer(tmp, n);
 
-		if (client.getBuffer().size() > 4000) {
+		if (client.getIbuffer().size() > 4000) {
 			std::cerr << "Client flooding, disconnecting..." << std::endl;
 			close_client(client.getFd());
 			return true;
@@ -212,7 +215,7 @@ bool IRCServ::read_from_client(IRCClient & client)
 			else if (errno == EINTR)
 				continue;
 			else
-				throw std::runtime_error(std::string("recv: ")
+				throw std::runtime_error(std::string("recv(): ")
 				+ strerror(errno));
 		}
 	}
@@ -220,33 +223,63 @@ bool IRCServ::read_from_client(IRCClient & client)
 
 void IRCServ::process_client_buffer(int fd)
 {
-	std::string &buf = clients[fd].getBuffer();
+		std::string &buf = clients[fd].getIbuffer();
+		while (true)
+		{
+				size_t pos = buf.find("\r\n");
+				size_t terminator_len = 2;
+				if (pos == std::string::npos) {
+						pos = buf.find('\n');
+						terminator_len = 1;
+				}
+				if (pos == std::string::npos) {
+						if (buf.size() > 512)
+								throw std::runtime_error("Line too long");
+						break; 
+				}
+				std::string raw_line = buf.substr(0, pos);
+				buf.erase(0, pos + terminator_len);
+				if (raw_line.size() > 510)
+						raw_line = raw_line.substr(0, 510);
 
-	while (true)
-	{
-		size_t pos = buf.find("\r\n");
-		bool found_crlf = true;
-		if (pos == std::string::npos) {
-			pos = buf.find('\n');
-			found_crlf = false;
+				IRCMessage ircMsg;
+				try {
+						ircMsg = IRCMessage::parse(raw_line);
+						std::cout << fd << ": " << ircMsg.toString() << std::endl;
+				} catch (...) {
+						std::cerr << fd << ": Error parsing => " << raw_line << std::endl;
+				}
+				answer_command(ircMsg, fd);
 		}
-		if (pos == std::string::npos)
-			break;
-		if (pos > 510)
-			pos = 510;
-		// Remover la parte consumida
-		std::string message = buf.substr(0, pos);
-		if (found_crlf)
-			buf.erase(0, pos + 2);
-		else
-			buf.erase(0, pos + 1);
-		// PARSEO
-		try {
-			IRCMessage ircMsg = IRCMessage::parse(message);
-			std::cout << fd << ": " << ircMsg.toString() << std::endl;
-		} catch (...) {
-			std::cerr << fd << ": Unable to parse message => " << message << std::endl;
-		}
-	}
 }
+
+void IRCServ::answer_command(IRCMessage &msg, int fd)
+{
+    switch (msg.getCommand())
+    {
+        // === OBLIGATORIOS por subject ===
+        // case CMD_KICK:     answer_kick(msg, fd);     break;
+        // case CMD_INVITE:   answer_invite(msg, fd);   break;
+        // case CMD_TOPIC:    answer_topic(msg, fd);    break;
+        // case CMD_MODE:     answer_mode(msg, fd);     break;
+        case CMD_PASS:     answer_pass(msg, fd);     break;
+        case CMD_NICK:     answer_nick(msg, fd);     break;
+        case CMD_USER:     answer_user(msg, fd);     break;
+        // case CMD_QUIT:     answer_quit(msg, fd);     break;
+
+        // // === extras ===
+        // case CMD_JOIN:     answer_join(msg, fd);     break;
+        // case CMD_PART:     answer_part(msg, fd);     break;
+        // case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
+        // case CMD_NOTICE:   answer_notice(msg, fd);   break;
+        // case CMD_PING:     answer_ping(msg, fd);     break;
+        // case CMD_PONG:     answer_pong(msg, fd);     break;
+
+        default:
+            // (???) Enviar error ERR_UNKNOWNCOMMAND (421) al cliente
+            break;
+    }
+}
+
+
 

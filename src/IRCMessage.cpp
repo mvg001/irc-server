@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCMessage.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvg001 <mvg001@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 11:55:03 by user1             #+#    #+#             */
-/*   Updated: 2026/01/30 13:40:52 by mvg001           ###   ########.fr       */
+/*   Updated: 2026/02/02 19:38:10 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ IRCMessage::IRCMessage(const string prefix,
   const IRCCommand command, 
   vector<string> params):
   prefix(prefix), command(command), parameters(params) {}
+
+IRCMessage::IRCMessage() : command(IRCCommand()) {}
 
 static void checkBasics(string& str) {
   if (str.empty()) 

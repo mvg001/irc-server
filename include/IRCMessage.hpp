@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCMessage.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:44:00 by user1             #+#    #+#             */
-/*   Updated: 2026/01/29 13:55:30 by user1            ###   ########.fr       */
+/*   Updated: 2026/02/02 19:34:28 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ using std::pair;
 typedef pair<vector<string>::const_iterator, vector<string>::const_iterator> vectorIteratorPairType;
 class IRCMessage {
 public:
+	IRCMessage();
   IRCMessage(const string prefix, const IRCCommand command, vector<string> params);
   static IRCMessage parse(string& str);
   virtual ~IRCMessage();

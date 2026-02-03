@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:33:34 by user1            ###   ########.fr       */
+/*   Updated: 2026/02/02 20:12:40 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,23 +212,47 @@ std::string IRCClient::toString() const {
   return buf.str();
 }
 
-void IRCClient::addToBuffer(const std::string & s)
+//Ibuffer
+
+void IRCClient::addToIbuffer(const std::string & s)
 {
-  buffer += s;
+  Ibuffer += s;
 }
 
-void IRCClient::addToBuffer(const char * s, size_t n)
+void IRCClient::addToIbuffer(const char * s, size_t n)
 {
-  buffer.append(s, n);
+  Ibuffer.append(s, n);
 }
 
-void IRCClient::setBuffer(const std::string & s)
+void IRCClient::setIbuffer(const std::string & s)
 {
-  buffer = s;
-
+  Ibuffer = s;
 }
 
-std::string & IRCClient::getBuffer()
+std::string & IRCClient::getIbuffer()
 {
-  return buffer;
+  return Ibuffer;
+}
+
+
+//Obuffer
+
+void IRCClient::addToObuffer(const std::string & s)
+{
+  Obuffer += s;
+}
+
+void IRCClient::addToObuffer(const char * s, size_t n)
+{
+  Obuffer.append(s, n);
+}
+
+void IRCClient::setObuffer(const std::string & s)
+{
+  Obuffer = s;
+}
+
+std::string & IRCClient::getObuffer()
+{
+  return Obuffer;
 }

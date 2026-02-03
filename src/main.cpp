@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:17:48 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 17:35:35 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/02 19:08:39 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int main(int ac, char **av)
 {
 	if (ac != 3) {
 		std::cerr << "Usage: ircserver <port> <client_password>" << std::endl;
-		return (1);
+		return 1;
 	}
 	std::pair<int, bool> pairPort = ft_atoi(av[1]);
 	if (!pairPort.second) {

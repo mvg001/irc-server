@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user1 <user1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:36:20 by user1             #+#    #+#             */
-/*   Updated: 2026/01/28 15:34:10 by user1            ###   ########.fr       */
+/*   Updated: 2026/02/02 20:10:08 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,15 +156,25 @@ public:
   * @returns {std::string} with the contents of the object */
   std::string toString() const;
 
-  /** Edit buffer */
-  void addToBuffer(const std::string & s);
-  void addToBuffer(const char * s, size_t n);
+  /** Edit Ibuffer */
+  void addToIbuffer(const std::string & s);
+  void addToIbuffer(const char * s, size_t n);
 
-  /** Set buffer */
-  void setBuffer(const std::string & s);
+  /** Set Ibuffer */
+  void setIbuffer(const std::string & s);
 
-  /** Get buffer */
-  std::string & getBuffer();
+  /** Get Ibuffer */
+  std::string & getIbuffer();
+
+	/** Edit Obuffer */
+  void addToObuffer(const std::string & s);
+  void addToObuffer(const char * s, size_t n);
+
+  /** Set Obuffer */
+  void setObuffer(const std::string & s);
+
+  /** Get Obuffer */
+  std::string & getObuffer();
 
 private:
   int fd;
@@ -173,7 +183,8 @@ private:
   std::string fullname;
   std::set<std::string> channelNames;
   std::set<FtIRCFlag> flags;
-  std::string buffer;
+  std::string Ibuffer;
+  std::string Obuffer;
 };
 
 #endif
