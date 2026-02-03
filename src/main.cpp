@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:17:48 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 12:05:17 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 13:14:48 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,22 +26,21 @@ int main(int ac, char **av)
 		std::cerr << "Usage: ircserver <port> <client_password>" << std::endl;
 		return 1;
 	}
+
 	std::pair<int, bool> pairPort = ft_atoi(av[1]);
 	if (!pairPort.second) {
 		std::cerr << "Invalid server port" << std::endl;
 		return 1;
 	}
 
-	IRCServ server;
-	try
-		{server = IRCServ(pairPort.first);}
-	catch(std::runtime_error &e)
-		{std::cerr << e.what() << std::endl; return;}
-
-	try
-		{server.run();}
-	catch(std::runtime_error &e)
-		{std::cerr << e.what() << std::endl; return;}
+	try {
+			IRCServ server(pairPort.first);
+			server.run();
+	}
+	catch(std::runtime_error &e) {
+			std::cerr << e.what() << std::endl; 
+			return 1;
+	}
 
 	return 0;
 }

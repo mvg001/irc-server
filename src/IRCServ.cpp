@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 20:59:46 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 13:20:44 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ IRCServ::IRCServ(int listening_port) : listening_socket(0), epoll_fd(0)
 		throw std::runtime_error(std::string("Fcntl: ")
 		+ strerror(errno));
 
-	this->setEpollFd(epoll_create1(EPOLL_CLOEXEC));
+	setEpollFd(epoll_create1(EPOLL_CLOEXEC));
 	if (epoll_fd == -1)
 		throw std::runtime_error(std::string("Epoll_create1: ")
 		+ strerror(errno));
@@ -199,7 +199,7 @@ bool IRCServ::read_from_client(IRCClient & client)
 		if (n > 0)
 			client.addToIbuffer(tmp, n);
 
-		if (client.getIbuffer().size() > 4000) {
+		else if (client.getIbuffer().size() > 4000) {
 			std::cerr << "Client flooding, disconnecting..." << std::endl;
 			close_client(client.getFd());
 			return true;

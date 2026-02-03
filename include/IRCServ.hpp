@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 11:59:16 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 13:04:24 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@
 class IRCServ {
 public:
 		IRCServ();
-		IRCServ::IRCServ(int listening_port);
-		IRCServ::~IRCServ();
+		IRCServ(int listening_port);
+		~IRCServ();
 
     int																getListeningSocket() const;
     void															setListeningSocket(int socket);
@@ -51,18 +51,18 @@ public:
     const struct epoll_event*					getEvents() const;
     void															setEvent(int fd, epoll_event event);
 
-		void															run();
-		void															process_client_buffer(int fd);
-		void															close_client(int fd);
-		void															accept_new_connection();
-		bool															read_from_client(IRCClient & client);
-		void															answer_command(IRCMessage & msg, int fd);
-		void 															queue_and_send(int fd, std::string data);
+		void			run();
+		void			process_client_buffer(int fd);
+		void			close_client(int fd);
+		void			accept_new_connection();
+		bool			read_from_client(IRCClient & client);
+		void			answer_command(IRCMessage & msg, int fd);
+		void			queue_and_send(int fd, std::string data);
 
 
-		void IRCServ::answer_pass(IRCMessage & msg, int fd);
-		void IRCServ::answer_nick(IRCMessage & msg, int fd);
-		void IRCServ::answer_user(IRCMessage & msg, int fd);
+		void					answer_pass(IRCMessage & msg, int fd);
+		void					answer_nick(IRCMessage & msg, int fd);
+		void					answer_user(IRCMessage & msg, int fd);
 
 private:
     int listening_socket;
