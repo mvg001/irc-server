@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 13:04:24 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 16:04:24 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ public:
 		void					answer_pass(IRCMessage & msg, int fd);
 		void					answer_nick(IRCMessage & msg, int fd);
 		void					answer_user(IRCMessage & msg, int fd);
+    void					answer_ping(IRCMessage & msg, int fd);
 
 private:
     int listening_socket;
