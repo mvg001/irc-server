@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 18:39:37 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/04 15:09:55 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "IRCServ.hpp"
+#include <cstdlib>
 
-IRCServ::IRCServ() : listening_socket(0), epoll_fd(0) {}
+IRCServ::IRCServ() : listening_socket(0), epoll_fd(0), server_name(SERVER_NAME) {}
 
 IRCServ::~IRCServ()
 {
@@ -22,7 +23,7 @@ IRCServ::~IRCServ()
 
 IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0), epoll_fd(0), clientPassword(password)
 {
-	server_name = "42_irc_server";
+	server_name = SERVER_NAME;
 		listening_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (listening_socket == -1)
 		throw std::runtime_error(std::string("socket: ")
@@ -35,7 +36,7 @@ IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0)
 		+ strerror(errno));
 
 	struct sockaddr_in server_addr;
-	memset(&server_addr, 0, sizeof(server_addr));
+	std::memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_port = htons(listening_port);
@@ -275,6 +276,10 @@ void IRCServ::process_client_buffer(int fd)
 		}
 }
 
+std::string IRCServ::getServerName(void) const{
+	return (server_name);
+}
+
 void IRCServ::answer_command(IRCMessage &msg, int fd)
 {
     switch (msg.getCommand())
@@ -294,7 +299,7 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         // case CMD_PART:     answer_part(msg, fd);     break;
         // case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
         // case CMD_NOTICE:   answer_notice(msg, fd);   break;
-        // case CMD_PING:     answer_ping(msg, fd);     break;
+        case CMD_PING:     answer_ping(msg, fd);     break;
         // case CMD_PONG:     answer_pong(msg, fd);     break;
 
         default:
