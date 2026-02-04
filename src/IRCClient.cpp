@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 12:01:20 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/04 10:09:35 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,18 +60,19 @@ bool IRCClient::setNick(const std::string& nick) {
 }
 
 bool IRCClient::isValidNick(const std::string &nick) {
-  if (nick.empty() || nick.length() > MAX_NICK_LENGTH) return false;
-  if (!ft_isLetter(nick.at(0))) return false;
-  if (!ft_isSpecial(nick.at(0))) return false;
-  std::string::const_iterator it;
-  for (it = ++(nick.begin()); it != nick.end(); ++it) {
-    if (ft_isLetter(*it)) continue;
-    if (ft_isDigit(*it)) continue;
-    if (ft_isSpecial(*it)) continue;
-    if (*it == '-') continue;
-    return false;
-  }
-  return true;
+	if (nick.empty() || nick.length() > MAX_NICK_LENGTH) return false;
+
+	if (!ft_isLetter(nick.at(0)) && !ft_isSpecial(nick.at(0))) return false;
+
+	std::string::const_iterator it = nick.begin();
+	for (++it; it != nick.end(); ++it) {
+		if (ft_isLetter(*it)) continue;
+		if (ft_isDigit(*it)) continue;
+		if (ft_isSpecial(*it)) continue;
+		if (*it == '-') continue;
+		return false;
+	}
+	return true;
 }
 const std::string& IRCClient::getUsername() const { return username; }
 
@@ -255,3 +256,15 @@ std::string & IRCClient::getObuffer()
 {
   return Obuffer;
 }
+
+std::string & IRCClient::getHost()
+{
+	return host;
+}
+
+void IRCClient::setHost(const std::string & s)
+{
+	host = s;
+}
+
+
