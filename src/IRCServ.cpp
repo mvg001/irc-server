@@ -3,14 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 18:39:37 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/04 15:32:34 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "IRCServ.hpp"
+#include <cerrno>
+#include <cstring>
+#include <stdexcept>
+#include <iostream>
+#include <sstream>
+
+using std::strerror;
 
 IRCServ::IRCServ() : listening_socket(0), epoll_fd(0) {}
 
@@ -20,7 +27,7 @@ IRCServ::~IRCServ()
 	close(listening_socket);
 }
 
-IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0), epoll_fd(0), clientPassword(password)
+IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0), clientPassword(password), epoll_fd(0)
 {
 	server_name = "42_irc_server";
 		listening_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -43,7 +50,7 @@ IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0)
 	if (bind(listening_socket, (struct sockaddr *)&server_addr,
 		sizeof(server_addr)) == -1)
 		throw std::runtime_error(std::string("Bind: ")
-		+ strerror(errno));
+		+ std::strerror(errno));
 
 	if (listen(listening_socket, 10) == -1)
 		throw std::runtime_error(std::string("Listen: ")
@@ -110,9 +117,9 @@ const struct epoll_event* IRCServ::getEvents() const {
 void IRCServ::setEvent(int fd, epoll_event event) {
 	events[fd] = event;
 }
-void IRCServ::addToNicks(const std::string& n)
+void IRCServ::addToNicks(const std::string& n, int fd)
 {
-    nicks.insert(n);
+		nicks[n] = fd;
 }
 void IRCServ::rmFromNicks(const std::string& n)
 {

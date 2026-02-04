@@ -1,4 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   answers.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/04 15:34:32 by mvassall          #+#    #+#             */
+/*   Updated: 2026/02/04 15:43:48 by mvassall         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "IRCServ.hpp"
+#include <sstream>
+#include <iostream>
 
 // void IRCServ::answer_kick(IRCMessage & msg, int fd) {}
 
@@ -68,7 +82,7 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 	}
 
 	clients[fd].setNick(new_nick);
-	addToNicks(new_nick);
+	addToNicks(new_nick, fd);
 	clients[fd].setFlag(NICK_FLAG);
 
 	if (old_nick != "") {
@@ -151,7 +165,7 @@ void IRCServ::broadcast(int fd, std::string notify_msg)
 
 		pairIterators cits = chan->getChannelIterators();
 		for (; cits.first != cits.second; ++cits.first) {
-			if (*(targets.insert(getFdFromNick(*cits.first)).first) == -1)
+			if (*(targets.insert(nicks[*cits.first]).first) == -1)
 				throw std::runtime_error("Tried to reach nonexistent client");
 		}
 	}
@@ -159,13 +173,4 @@ void IRCServ::broadcast(int fd, std::string notify_msg)
 	for (std::set<int>::iterator it = targets.begin(); it != targets.end(); ++it) {
 		queue_and_send(*it, notify_msg);
 	}
-}
-
-int IRCServ::getFdFromNick(string s)
-{
-		for (std::map<int, IRCClient>::iterator it = clients.begin(); it != clients.end(); ++it) {
-				if (it->second.getNick() == s)
-						return it->second.getFd();
-		}
-		return -1;
 }
