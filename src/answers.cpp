@@ -18,7 +18,7 @@
 
 // void IRCServ::answer_notice(IRCMessage & msg, int fd) {}
 
-// void IRCServ::answer_ping(IRCMessage & msg, int fd) {}
+
 
 // void IRCServ::answer_pong(IRCMessage & msg, int fd) {}
 
