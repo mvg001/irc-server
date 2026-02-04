@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:44:00 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 19:34:28 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 17:22:50 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 using std::string;
 using std::vector;
 using std::pair;
+
 typedef pair<vector<string>::const_iterator, vector<string>::const_iterator> vectorIteratorPairType;
 class IRCMessage {
 public:

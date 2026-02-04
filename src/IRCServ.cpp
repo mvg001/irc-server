@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 13:20:44 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 18:39:37 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,9 @@ IRCServ::~IRCServ()
 	close(listening_socket);
 }
 
-IRCServ::IRCServ(int listening_port) : listening_socket(0), epoll_fd(0)
+IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0), epoll_fd(0), clientPassword(password)
 {
+	server_name = "42_irc_server";
 		listening_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (listening_socket == -1)
 		throw std::runtime_error(std::string("socket: ")
@@ -74,10 +75,10 @@ IRCServ::IRCServ(int listening_port) : listening_socket(0), epoll_fd(0)
 
 
 int IRCServ::getListeningSocket() const{
-		return listening_socket;
+	return listening_socket;
 }
 void IRCServ::setListeningSocket(int socket) {
-		listening_socket = socket;
+	listening_socket = socket;
 }
 void IRCServ::setClientPassword(std::string& password) {
 	clientPassword = password;
@@ -86,28 +87,40 @@ bool IRCServ::checkClientPassword(std::string& password) const {
 	return password == clientPassword;
 }
 int IRCServ::getEpollFd() const{
-		return epoll_fd;
+	return epoll_fd;
 }
 void IRCServ::setEpollFd(int fd) {
-		epoll_fd = fd;
+	epoll_fd = fd;
 }
 const std::map<int, IRCClient>& IRCServ::getClients() const {
-		return clients;
+return clients;
 }
 std::map<int, IRCClient>& IRCServ::getClients() {
-		return clients;
+	return clients;
 }
 void IRCServ::setClients(const std::map<int, IRCClient>& newClients) {
-		clients = newClients;
+	clients = newClients;
 }
 struct epoll_event* IRCServ::getEvents() {
-		return events;
+	return events;
 }
 const struct epoll_event* IRCServ::getEvents() const {
-		return events;
+	return events;
 }
 void IRCServ::setEvent(int fd, epoll_event event) {
-				events[fd] = event;
+	events[fd] = event;
+}
+void IRCServ::addToNicks(const std::string& n)
+{
+    nicks.insert(n);
+}
+void IRCServ::rmFromNicks(const std::string& n)
+{
+    nicks.erase(n);
+}
+bool IRCServ::nickIsUnique(const std::string& n)
+{
+    return (nicks.find(n) == nicks.end());
 }
 
 
@@ -152,7 +165,7 @@ void IRCServ::close_client(int fd)
 	close(fd);
 	clients.erase(fd);
 
-	std::cout << "Cliente" << fd << "desconectado" << std::endl;
+	std::cout << "Cliente [" << fd << "] desconectado" << std::endl;
 }
 
 // Acepta una nueva conexión entrante en listening_socket.
@@ -162,28 +175,35 @@ void IRCServ::close_client(int fd)
 // Devuelve 0 en éxito, -1 en error (y no registra el cliente).
 void IRCServ::accept_new_connection()
 {
-	int fd = accept(listening_socket, NULL, NULL);
-	if (fd == -1)
-		throw std::runtime_error(std::string("accept: ")
-		+ strerror(errno));
+		struct sockaddr_in client_addr;
+		socklen_t addr_len = sizeof(client_addr);
 
-	if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1) {
-		close(fd);
-		throw std::runtime_error(std::string("set nonblocking client: ")
-		+ strerror(errno));
-	}
+		int fd = accept(listening_socket, (struct sockaddr *)&client_addr, &addr_len);
+		if (fd == -1)
+				throw std::runtime_error(std::string("accept: ") + strerror(errno));
 
-	struct epoll_event client_ev;
-	client_ev.events = EPOLLIN | EPOLLET;
-	client_ev.data.fd = fd;
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &client_ev) == -1){
-		close(fd);
-		throw std::runtime_error(std::string("epoll_ctl add client: ")
-		+ strerror(errno));
-	}
+		unsigned char *ip = (unsigned char *)&client_addr.sin_addr.s_addr;
+		std::ostringstream oss;
+		oss << (int)ip[0] << "." << (int)ip[1] << "." << (int)ip[2] << "." << (int)ip[3];
+		std::string host = oss.str();
 
-	clients[fd] = IRCClient(fd); // crear cliente
-	std::cout << "Nueva conexión: fd=" << fd << std::endl;
+		if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1) {
+				close(fd);
+				throw std::runtime_error(std::string("set nonblocking client: ") + strerror(errno));
+		}
+
+		struct epoll_event client_ev;
+		client_ev.events = EPOLLIN | EPOLLET;
+		client_ev.data.fd = fd;
+		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &client_ev) == -1){
+				close(fd);
+				throw std::runtime_error(std::string("epoll_ctl add client: ") + strerror(errno));
+		}
+
+		clients[fd] = IRCClient(fd);
+		clients[fd].setHost(host);
+
+		std::cout << "Nueva conexión: fd=" << fd << " host=" << host << std::endl;
 }
 
 // Lee todo lo disponible en modo non-blocking (EPOLLET) desde fd.
@@ -226,6 +246,8 @@ void IRCServ::process_client_buffer(int fd)
 		std::string &buf = clients[fd].getIbuffer();
 		while (true)
 		{
+				if (clients.find(fd) == clients.end())
+					return;
 				size_t pos = buf.find("\r\n");
 				size_t terminator_len = 2;
 				if (pos == std::string::npos) {

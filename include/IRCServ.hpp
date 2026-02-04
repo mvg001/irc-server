@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 13:04:24 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/04 09:49:30 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #include <stdexcept> 
 
 #include "IRCServ.hpp"
-#include "IRCClient.hpp"
+#include "IRCChannel.hpp"
 #include "utils.hpp"
 #include "IRCClient.hpp"
 #include "IRCMessage.hpp"
@@ -35,7 +35,7 @@
 class IRCServ {
 public:
 		IRCServ();
-		IRCServ(int listening_port);
+		IRCServ(int listening_port, std::string password);
 		~IRCServ();
 
     int																getListeningSocket() const;
@@ -50,7 +50,12 @@ public:
     struct epoll_event*								getEvents();
     const struct epoll_event*					getEvents() const;
     void															setEvent(int fd, epoll_event event);
+		void															addToNicks(const string & n);
+		void															rmFromNicks(const string & n);
+		bool															nickIsUnique(const string & n);
+		int 															getFdFromNick(string s);
 
+		
 		void			run();
 		void			process_client_buffer(int fd);
 		void			close_client(int fd);
@@ -58,6 +63,7 @@ public:
 		bool			read_from_client(IRCClient & client);
 		void			answer_command(IRCMessage & msg, int fd);
 		void			queue_and_send(int fd, std::string data);
+		void			broadcast(int fd, std::string notify_msg);
 
 
 		void					answer_pass(IRCMessage & msg, int fd);
@@ -71,6 +77,7 @@ private:
     std::map<int, IRCClient> clients;
     struct epoll_event events[16];
 		std::set<std::string> nicks;
-		std::set<std::string> channels;
+		std::map<string, IRCChannel> channels;
+		string server_name;
 };
 #endif

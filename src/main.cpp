@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:17:48 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 13:14:48 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/03 16:50:50 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int main(int ac, char **av)
 	}
 
 	try {
-			IRCServ server(pairPort.first);
+			IRCServ server(pairPort.first, av[2]);
 			server.run();
 	}
 	catch(std::runtime_error &e) {
