@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/04 12:44:57 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/04 14:46:33 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 #include "IRCClient.hpp"
 #include "IRCMessage.hpp"
 
+#define SERVER_NAME "42_irc_server"
 
 class IRCServ {
 public:
@@ -54,6 +55,7 @@ public:
 		void															rmFromNicks(const string & n);
 		bool															nickIsUnique(const string & n);
 		int 															getFdFromNick(string s);
+		std::string												getServerName(void) const;
 
 		
 		void			run();
