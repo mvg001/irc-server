@@ -56,5 +56,4 @@ dkms.conf
 
 docs/
 tests/
-compile_flags.txt
 ircserv
