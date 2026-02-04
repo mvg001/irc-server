@@ -38,7 +38,6 @@ void IRCServ::answer_pass(IRCMessage & msg, int fd)
 	}
 	if (recv_pass.str() != clientPassword)
 	{
-		std::cout << "debug: password incorrecta" << std::endl;
 		queue_and_send(fd, "464 * :Password incorrect\r\n");
 		close_client(fd);
 		return;
@@ -84,7 +83,6 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 		std::string welcome = ":server 001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + clients[fd].getUsername() + "@" + clients[fd].getHost() + "\r\n";
 		queue_and_send(fd, welcome);
 	}
-
 }
 
 void IRCServ::answer_user(IRCMessage & msg, int fd)
