@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/04 09:49:30 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/04 10:13:58 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ public:
 		void					answer_pass(IRCMessage & msg, int fd);
 		void					answer_nick(IRCMessage & msg, int fd);
 		void					answer_user(IRCMessage & msg, int fd);
+    void					answer_ping(IRCMessage & msg, int fd);
 
 private:
     int listening_socket;
