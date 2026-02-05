@@ -6,18 +6,24 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 16:03:11 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/05 16:45:52 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "IRCChannel.hpp"
 #include "utils.hpp"
 #include <sstream>
+#include <stdexcept>
 #include <utility>
 
-IRCChannel::IRCChannel(): name("undefined") {}
+IRCChannel::IRCChannel(): name("invalid") {}
 
-IRCChannel::IRCChannel(const std::string& name): name(name) {}
+IRCChannel::IRCChannel(const std::string& name) {
+  if (!isValidName(name))
+    throw std::invalid_argument("invalid channel name");
+  this->name = name;
+  ft_toLower(this->name);
+}
 
 IRCChannel::IRCChannel(const IRCChannel& other):
   name(other.name), nicks(other.nicks) {}
@@ -32,12 +38,31 @@ IRCChannel::IRCChannel(const IRCChannel& other):
     
 IRCChannel::~IRCChannel() {}
 
+bool IRCChannel::isValidName(const std::string &name) {
+  // maxlength 50 chars
+  if (name.length() > MAX_NAME_LENGTH) return false;
+  // must start with any of "#&+!"
+  static const std::string VALID_PREFIX = "#&+!";  // TODO safe_channels
+  if (VALID_PREFIX.find_first_of(name[0]) == std::string::npos)
+    return false;
+  // must not have any char " ,:\x07"
+  static const std::string INVALID_CHARS = " ,:\x07";
+  for (std::string::const_iterator it = INVALID_CHARS.begin();
+      it != INVALID_CHARS.end(); ++it)
+    if (name.find_first_of(*it) != std::string::npos)
+      return false;
+  return true;
+}
+
 const std::string& IRCChannel::getName() const {
   return name;
 }
 
 bool IRCChannel::setName(const std::string& name) {
+  if (!isValidName(name))
+    return false;
   this->name = name;
+  ft_toLower(this->name);
   return true;
 }
 

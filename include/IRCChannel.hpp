@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/02/04 17:22:51 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/05 16:51:41 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,14 @@
 
 class IRCChannel {
 public:
+  const static unsigned MAX_NAME_LENGTH = 50;
   IRCChannel();
 	IRCChannel(const std::string& name);
   IRCChannel(const IRCChannel& other);
   IRCChannel& operator=(const IRCChannel& other);
   virtual ~IRCChannel();
 
-
+  static bool isValidName(const std::string& name);
   const std::string& getName() const;
   bool setName(const std::string& name);
   bool checkUser(const std::string& channelName) const;

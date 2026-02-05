@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 14:22:07 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 11:28:14 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/05 16:38:50 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,14 @@ void ft_toUpper(std::string& str) {
   for (it=str.begin(); it!=str.end(); ++it) {
     if ('a' <= *it && *it <= 'z')
       *it = (*it - 32);
+  }
+}
+
+void ft_toLower(std::string& str) {
+  std::string::iterator it;
+  for (it=str.begin(); it!=str.end(); ++it) {
+    if ('A' <= *it && *it <= 'Z')
+      *it = (*it + 32);
   }
 }
 

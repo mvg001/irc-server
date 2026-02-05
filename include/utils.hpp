@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:05:14 by user1             #+#    #+#             */
-/*   Updated: 2026/02/02 15:52:08 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/05 16:38:15 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,6 @@ bool ft_isSpecial(char c);
 std::string ft_itoa(int n);
 std::pair<int, bool> ft_atoi(const std::string& str);
 void ft_toUpper(std::string& str);
+void ft_toLower(std::string& str);
 const std::string& getLocalHostname();
 #endif
