@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCChannel.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 11:57:17 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/04 17:22:51 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ public:
   std::string toString() const;
 private:
   std::string name;
-	std::set<std::string> nicks;
+	std::set<std::string> nicks;    // nicks subscribed to the channel
+  std::string key;                // password to join the channel
 };
 #endif
