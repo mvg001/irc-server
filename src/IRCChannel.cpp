@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
-/*   Updated: 2026/02/07 10:43:21 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/08 12:23:34 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,19 @@ bool IRCChannel::setChannelMode(const ChannelMode chMode) {
 bool IRCChannel::unsetChannelMode(const ChannelMode chMode) {
   return channelModes.erase(chMode) != 0;
 }
+
+const string& IRCChannel::getTopic() const {
+  return topic;
+}
+
+bool IRCChannel::setTopic(const string& nick, const string& newTopic) {
+  if ((channelModes.count(TOPIC) == 0)
+    || (nicks.count(nick) != 0 && nicks[nick] == CHANNEL_OPERATOR)) {
+    topic = newTopic;
+    return true;
+  }
+  return false;
+} 
 
 void IRCChannel::sendMessageThrough(IRCMessage& msg) const {
   // TODO

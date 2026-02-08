@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/02/07 11:01:39 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/08 12:25:32 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,6 +143,15 @@ const static unsigned MAX_NAME_LENGTH = 50;
   /** Sets the maximum number of users subscribed to this channel.
   Only active if this channel has USER_LIMIT mode set */
   void setUserLimit(unsigned userLimit);
+
+  /** @returns {const string&} current topic for the channel */
+  const string& getTopic() const;
+  
+  /** Sets a new topic to the channel.
+  If current channel is moderated (mode TOPIC set) the user
+  requesting the change must be a CHANNEL_OPERATOR
+  @returns (bool) true if all conditions met  */
+  bool setTopic(const string& user, const string& newTopic); 
   
   void sendMessageThrough(IRCMessage& msg) const;
 
@@ -156,5 +165,6 @@ private:
   string key;                       // password to join the channel
   set<ChannelMode> channelModes;
   unsigned userLimit;               // max number of clients
+  string topic;                     // current channel topic
 };
 #endif
