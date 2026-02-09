@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 12:21:25 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 14:35:59 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,7 +294,7 @@ void	IRCServ::check_clients_timeout(void){
 	using IT = std::map<int, IRCClient>::iterator;
 
 	
-	for (IT it = clients.begin(); it != clients.end();){ //no poner ++it por que segfault
+	for (IT it = clients.begin(); it != clients.end();){ //note* below
 		int 			fd = it->first;
 		IRCClient &client = it->second;
 		time_t		last = client.getLastActivity();
@@ -304,22 +304,23 @@ void	IRCServ::check_clients_timeout(void){
 		only should send it once because with epoll can saturate it during those extra 60 sec.*/
 		if (now - last > TIMEOUT && now - last <= TIMEOUT + 60 && !ping_sent){
 			IRCServ::send_ping_to_client(fd);
-			client.set_server_ping_sent();
+			client.set_server_ping_sent(); //set to true
 			++it;
 		}
 
 		//If it didnt reply to PING with PONG in 60 seconds more we kick it
+		/*note*: If the ++it would be only in the for and not in each 'if' as it is now,
+		when we remove a client, and we make in the for the ++it, it would produce a segfaul
+		We cannot have only an ++it here in that case and the for one, because we would
+		jump over an valid one making it = it + 2. */
+		
 		else if (now - last > TIMEOUT + 60){
 			std::ostringstream msg;
 			msg << "ERROR :Closign Link: Ping timeout: "
 			<< (TIMEOUT + 60) << "seconds\r\n";
 			queue_and_send(fd, msg.str());
-
-			//funcion para borrar fd y el fd del map.
-			int fd_to_close = fd;
-			++it;
-			//disconnect_client(fd_to_close) por hacer...
-			(void)fd_to_close;
+			++it; //note* above
+			close_client(fd); //hay que eliminar el nick y canales en la funcion
 		}
 		else
 			++it;
