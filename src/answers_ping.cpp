@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   answers_ping.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 16:02:52 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/04 16:40:32 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 16:15:27 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "IRCServ.hpp"
+#include <sstream>
 
 void IRCServ::answer_ping(IRCMessage & msg, int fd) {
 
