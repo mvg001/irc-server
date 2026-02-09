@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 17:23:04 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 20:52:13 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ public:
 		bool															nickIsUnique(const string & n);
 		int 															getFdFromNick(string s);
 		std::string												getServerName(void) const;
-
+		const std::map<const std::string, int>&	getNicks(void) const; //For privmsg.
 		
 		void			run();
 		void			process_client_buffer(int fd);
