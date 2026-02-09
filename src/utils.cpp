@@ -6,17 +6,19 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 14:22:07 by user1             #+#    #+#             */
-/*   Updated: 2026/02/05 16:38:50 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/08 17:10:59 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils.hpp"
+#include "IRCCommand.hpp"
 #include <climits>
 #include <cstring>
 #include <limits>
 #include <sstream>
 #include <unistd.h>
 #include <utility>
+#include <vector>
 
 bool ft_isLetter(char c) {
   return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
@@ -90,4 +92,37 @@ const std::string& getLocalHostname() {
       hostname = "Undefined";
   }
   return hostname;
+}
+
+std::vector<string> split(string s, const string& delimiter) {
+    std::vector<string> tokens;
+    size_t pos = 0;
+    string token;
+    while ((pos = s.find(delimiter)) != string::npos) {
+        token = s.substr(0, pos);
+        tokens.push_back(token);
+        s.erase(0, pos + delimiter.length());
+    }
+    tokens.push_back(s);
+    return tokens;
+}
+
+const string genErrUnknownCommand(const string& serverName,
+  const string& commandString) {
+  std::ostringstream oss;
+  oss << ':' << serverName 
+    << ' ' << ERR_UNKNOWNCOMMAND 
+    << ' ' << commandString
+    << " :Unknown command\r\n";
+  return oss.str();
+}
+
+const string genErrNeedMoreParams(const string& serverName,
+  const string& nickName) {
+  std::ostringstream oss;
+  oss << ':' << serverName 
+    << ' ' << ERR_NEEDMOREPARAMS 
+    << ' ' << nickName
+    << " :Not enough parameters\r\n";
+  return oss.str();
 }
