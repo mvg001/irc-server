@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/09 16:23:22 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 17:21:29 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -354,7 +354,7 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         // // === extras ===
         case CMD_JOIN:     answer_join(msg, fd);     break;
         case CMD_PART:     answer_part(msg, fd);     break;
-        // case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
+        case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
         // case CMD_NOTICE:   answer_notice(msg, fd);   break;
         case CMD_PING:     answer_ping(msg, fd);     break;
         case CMD_PONG:     answer_pong(msg, fd);     break;

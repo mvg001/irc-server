@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 16:05:45 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 17:23:04 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ public:
 		void 			answer_join(IRCMessage & msg, int fd);
 		void 			answer_part(IRCMessage & msg, int fd);	
 		void			answer_pong(IRCMessage & msg, int fd);
+		void			answer_privmsg(IRCMessage & msg, int fd);
 
 		//timeout checkout
 		void			send_ping_to_client(int fd);
