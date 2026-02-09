@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/02/08 12:25:32 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 15:41:43 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,8 +152,6 @@ const static unsigned MAX_NAME_LENGTH = 50;
   requesting the change must be a CHANNEL_OPERATOR
   @returns (bool) true if all conditions met  */
   bool setTopic(const string& user, const string& newTopic); 
-  
-  void sendMessageThrough(IRCMessage& msg) const;
 
   /** Generates a text view of the object
   * @returns {std::string} with the contents of the object */

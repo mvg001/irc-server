@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/02/05 09:50:27 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/08 13:44:06 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,7 +258,7 @@ std::string & IRCClient::getObuffer()
   return Obuffer;
 }
 
-std::string & IRCClient::getHost()
+const std::string& IRCClient::getHost() const
 {
 	return host;
 }

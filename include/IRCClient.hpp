@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:36:20 by user1             #+#    #+#             */
-/*   Updated: 2026/02/05 09:44:24 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 15:30:45 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ public:
   std::string & getObuffer();
 
 	/** Set & Get host*/
-	std::string & getHost();
+	const std::string & getHost() const;
 	void setHost(const std::string & s);
 
 private:
@@ -93,7 +93,7 @@ private:
   std::string nick;
   std::string username;
   std::string fullname;
-  std::string host;
+  std::string host;         // client hostname
   std::set<std::string> channelNames;
   std::set<FtIRCFlag> flags;
   std::string Ibuffer;

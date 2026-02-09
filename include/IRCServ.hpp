@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/06 17:16:21 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/08 13:54:04 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,12 @@ public:
 		void			queue_and_send(int fd, std::string data);
 		void			broadcast(int fd, std::string notify_msg);
 
-
-		void					answer_pass(IRCMessage & msg, int fd);
-		void					answer_nick(IRCMessage & msg, int fd);
-		void					answer_user(IRCMessage & msg, int fd);
-    void					answer_ping(IRCMessage & msg, int fd);
-
+		void			answer_pass(IRCMessage & msg, int fd);
+		void			answer_nick(IRCMessage & msg, int fd);
+		void			answer_user(IRCMessage & msg, int fd);
+    void			answer_ping(IRCMessage & msg, int fd);
+		void 			answer_join(IRCMessage & msg, int fd);
+		void 			answer_part(IRCMessage & msg, int fd);
 private:
     int listening_socket;
     std::string clientPassword;

@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/04 15:32:34 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/08 13:53:24 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,8 +297,8 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         // case CMD_QUIT:     answer_quit(msg, fd);     break;
 
         // // === extras ===
-        // case CMD_JOIN:     answer_join(msg, fd);     break;
-        // case CMD_PART:     answer_part(msg, fd);     break;
+        case CMD_JOIN:     answer_join(msg, fd);     break;
+        case CMD_PART:     answer_part(msg, fd);     break;
         // case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
         // case CMD_NOTICE:   answer_notice(msg, fd);   break;
         // case CMD_PING:     answer_ping(msg, fd);     break;
