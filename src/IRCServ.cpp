@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 14:35:59 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 14:37:26 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,7 +294,7 @@ void	IRCServ::check_clients_timeout(void){
 	using IT = std::map<int, IRCClient>::iterator;
 
 	
-	for (IT it = clients.begin(); it != clients.end();){ //note* below
+	for (IT it = clients.begin(); it != clients.end();){ //note* below because of not ++it here.
 		int 			fd = it->first;
 		IRCClient &client = it->second;
 		time_t		last = client.getLastActivity();
