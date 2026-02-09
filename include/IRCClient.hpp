@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:36:20 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 15:30:45 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 16:03:07 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <set>
 #include <string>
 #include "utils.hpp"
+#include <ctime>
 
 typedef enum {
   PASS_FLAG,        // after PASS command
@@ -88,6 +89,12 @@ public:
 	const std::string & getHost() const;
 	void setHost(const std::string & s);
 
+  time_t  getLastActivity(void) const;
+  void    updateLastActivity(void);
+  bool    get_server_ping_sent(void);
+  void    set_server_ping_sent(void);
+
+
 private:
   int fd;
   std::string nick;
@@ -98,6 +105,8 @@ private:
   std::set<FtIRCFlag> flags;
   std::string Ibuffer;
   std::string Obuffer;
+  time_t      last_activity;
+  bool        server_ping_sent;
 };
 
 #endif
