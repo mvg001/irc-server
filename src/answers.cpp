@@ -1,4 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   answers.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/04 15:34:32 by mvassall          #+#    #+#             */
+/*   Updated: 2026/02/07 10:58:13 by mvassall         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "IRCChannel.hpp"
+#include "IRCClient.hpp"
 #include "IRCServ.hpp"
+#include <sstream>
+#include <iostream>
 
 // void IRCServ::answer_kick(IRCMessage & msg, int fd) {}
 
@@ -67,7 +83,7 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 	}
 
 	clients[fd].setNick(new_nick);
-	addToNicks(new_nick);
+	addToNicks(new_nick, fd);
 	clients[fd].setFlag(NICK_FLAG);
 
 	if (old_nick != "") {
@@ -143,27 +159,23 @@ void IRCServ::broadcast(int fd, std::string notify_msg)
 	std::set<int> targets;
 	targets.insert(fd);
 
-	pairIterators its = clients[fd].getChannelIterators();
-	for (; its.first != its.second; ++its.first) {
-		IRCChannel* chan = &channels[*its.first];
-
-		pairIterators cits = chan->getChannelIterators();
-		for (; cits.first != cits.second; ++cits.first) {
-			if (*(targets.insert(getFdFromNick(*cits.first)).first) == -1)
-				throw std::runtime_error("Tried to reach nonexistent client");
-		}
+	if (clients.count(fd) == 0) return;
+	IRCClient client = clients[fd];
+	pairIterators channelIterators = clients[fd].getChannelIterators();
+	for (setOfStringsIterator chNameIt = channelIterators.first;
+		chNameIt != channelIterators.second; ++chNameIt) {
+		string channelName = *chNameIt;
+		if (channels.count(channelName) == 0) continue;
+		PairUserMapIterators uIts = channels[channelName].getUsersIterators();
+		for (map<string,UserMode>::const_iterator uit=uIts.first;
+			uit != uIts.second; ++uit) {
+				string nickName = uit->first;
+				if (nicks.count(nickName) == 0) continue;
+				targets.insert(nicks[nickName]);
+		} 
 	}
-
-	for (std::set<int>::iterator it = targets.begin(); it != targets.end(); ++it) {
+	for (std::set<int>::iterator it = targets.begin();
+		it != targets.end(); ++it) {
 		queue_and_send(*it, notify_msg);
 	}
-}
-
-int IRCServ::getFdFromNick(string s)
-{
-		for (std::map<int, IRCClient>::iterator it = clients.begin(); it != clients.end(); ++it) {
-				if (it->second.getNick() == s)
-						return it->second.getFd();
-		}
-		return -1;
 }

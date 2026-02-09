@@ -5,13 +5,22 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/04 15:33:12 by marcoga2         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2026/02/09 17:12:08 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
+
 #include "IRCServ.hpp"
-#include <cstdlib>
+#include <cerrno>
+#include <cstring>
+#include <stdexcept>
+#include <iostream>
+#include <sstream>
+#include <map>
+
+using std::strerror;
 
 IRCServ::IRCServ() : listening_socket(0), epoll_fd(0), server_name(SERVER_NAME) {}
 
@@ -21,7 +30,7 @@ IRCServ::~IRCServ()
 	close(listening_socket);
 }
 
-IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0), epoll_fd(0), clientPassword(password)
+IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0), clientPassword(password), epoll_fd(0)
 {
 	server_name = SERVER_NAME;
 		listening_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -44,7 +53,7 @@ IRCServ::IRCServ(int listening_port, std::string password) : listening_socket(0)
 	if (bind(listening_socket, (struct sockaddr *)&server_addr,
 		sizeof(server_addr)) == -1)
 		throw std::runtime_error(std::string("Bind: ")
-		+ strerror(errno));
+		+ std::strerror(errno));
 
 	if (listen(listening_socket, 10) == -1)
 		throw std::runtime_error(std::string("Listen: ")
@@ -111,9 +120,9 @@ const struct epoll_event* IRCServ::getEvents() const {
 void IRCServ::setEvent(int fd, epoll_event event) {
 	events[fd] = event;
 }
-void IRCServ::addToNicks(const std::string& n)
+void IRCServ::addToNicks(const std::string& n, int fd)
 {
-    nicks.insert(n);
+		nicks[n] = fd;
 }
 void IRCServ::rmFromNicks(const std::string& n)
 {
@@ -269,6 +278,7 @@ void IRCServ::process_client_buffer(int fd)
 				try {
 						ircMsg = IRCMessage::parse(raw_line);
 						std::cout << fd << ": " << ircMsg.toString() << std::endl;
+						answer_command(ircMsg, fd);
 				} catch (...) {
 						std::cerr << fd << ": Error parsing => " << raw_line << std::endl;
 				}
@@ -279,6 +289,54 @@ void IRCServ::process_client_buffer(int fd)
 std::string IRCServ::getServerName(void) const{
 	return (server_name);
 }
+
+void	IRCServ::send_ping_to_client(int fd){
+	std::ostringstream msg;
+	
+	if (clients.count(fd)){
+		msg << "PING :" << server_name << "\r\n";
+		queue_and_send(fd, msg.str());
+	}
+}
+
+void	IRCServ::check_clients_timeout(void){
+	time_t	now  = std::time(NULL);
+	
+	for (std::map<int, IRCClient>::iterator it = clients.begin(); it != clients.end();){ //note* below because of not ++it here.
+		int 			fd = it->first;
+		IRCClient &client = it->second;
+		time_t		last = client.getLastActivity();
+		bool			ping_sent = client.get_server_ping_sent();
+		
+		/*If client is TIMEOUT seconds without saying anything server send a PING
+		only should send it once because with epoll can saturate it during those extra 60 sec.*/
+		if (now - last > TIMEOUT && now - last <= TIMEOUT + 60 && !ping_sent){
+			IRCServ::send_ping_to_client(fd);
+			client.set_server_ping_sent(); //set to true
+			++it;
+		}
+
+		//If it didnt reply to PING with PONG in 60 seconds more we kick it
+		/*note*: If the ++it would be only in the for and not in each 'if' as it is now,
+		when we remove a client, and we make in the for the ++it, it would produce a segfaul
+		We cannot have only an ++it here in that case and the for one, because we would
+		jump over an valid one making it = it + 2. */
+		
+		else if (now - last > TIMEOUT + 60){
+			std::ostringstream msg;
+			msg << "ERROR :Closign Link: Ping timeout: "
+			<< (TIMEOUT + 60) << "seconds\r\n";
+			queue_and_send(fd, msg.str());
+			++it; //note* above
+			close_client(fd); //hay que eliminar el nick y canales en la funcion
+		}
+		else
+			++it;
+	}
+}
+
+
+
 
 void IRCServ::answer_command(IRCMessage &msg, int fd)
 {
@@ -295,12 +353,12 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         // case CMD_QUIT:     answer_quit(msg, fd);     break;
 
         // // === extras ===
-        // case CMD_JOIN:     answer_join(msg, fd);     break;
-        // case CMD_PART:     answer_part(msg, fd);     break;
+        case CMD_JOIN:     answer_join(msg, fd);     break;
+        case CMD_PART:     answer_part(msg, fd);     break;
         // case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
         // case CMD_NOTICE:   answer_notice(msg, fd);   break;
         case CMD_PING:     answer_ping(msg, fd);     break;
-        // case CMD_PONG:     answer_pong(msg, fd);     break;
+        case CMD_PONG:     answer_pong(msg, fd);     break;
 
         default:
             // (???) Enviar error ERR_UNKNOWNCOMMAND (421) al cliente
