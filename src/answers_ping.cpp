@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 16:02:52 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/04 16:23:50 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 16:23:08 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 void IRCServ::answer_ping(IRCMessage & msg, int fd) {
 
 	std::ostringstream ans;
+			
 	vectorIteratorPairType params = msg.getParameters();
 	if (params.first == params.second){ //no hay parametros
 		if (clients.count(fd)){
@@ -28,6 +29,6 @@ void IRCServ::answer_ping(IRCMessage & msg, int fd) {
 		}
 		return ;	
 	}
-	ans << ":" << server_name << " " << IRCCommandtoString(CMD_PONG) << " :" << server_name << " :" << *(params.first) << "\r\n"; 
+	ans << ":" << server_name << " PONG " << " :" << server_name << " :" + *(params.first) + "\r\n"; 
 	queue_and_send(fd, ans.str());
 }

@@ -6,11 +6,12 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 11:55:03 by user1             #+#    #+#             */
-/*   Updated: 2026/02/04 16:17:45 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 16:23:14 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
+#include <cstddef>
 #include <stdexcept>
 #include <sstream>
 
@@ -196,4 +197,26 @@ string IRCMessage::toString() const {
     }
     buf << "]";
     return buf.str();
+}
+
+const string& IRCMessage::getParam(size_t n) const {
+  if (n >= parameters.size())
+    throw std::out_of_range("invalid index");
+  return parameters[n];
+}
+
+const string IRCMessage::ircMessage() const {
+  std::ostringstream oss;
+  if (prefix.empty())
+    oss << ':' << prefix << ' ';
+  oss << IRCCommandtoString(command);
+  if (parameters.size() >= 1) {
+    for (size_t i=0; i < parameters.size() - 1; ++i) {
+      if (i != 0) oss << ' ';
+      oss << parameters[i];
+    }
+  }
+  if (parameters.size() != 0)
+    oss << " :" << parameters.back();
+  return oss.str();
 }
