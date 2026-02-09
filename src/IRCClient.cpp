@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 11:04:11 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 11:22:51 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@
 #include "IRCClient.hpp"
 #include "IRCMessage.hpp"
 #include "utils.hpp"
-#include <ctime>
 
-IRCClient::IRCClient() : fd(-1) {}
-IRCClient::IRCClient(int fd) : fd(fd) { 
+
+IRCClient::IRCClient() : fd(-1), last_activity(std::time(NULL)) {}
+IRCClient::IRCClient(int fd) : fd(fd), last_activity(std::time(NULL)) { 
   if (fd < 0) throw std::invalid_argument("invalid file descriptor");
 }
 IRCClient::IRCClient(const IRCClient &other):
@@ -28,17 +28,25 @@ IRCClient::IRCClient(const IRCClient &other):
     nick(other.nick), 
     username(other.username), 
     fullname(other.fullname),
+    //host(other.host), //no se estaba compiando
     channelNames(other.channelNames), 
-    flags(other.flags) {}
+    flags(other.flags),
+    //Ibuffer(other.Ibuffer), //no lo copiaba
+    //Obuffer(other.Obuffer), //no lo copiaba
+    last_activity(other.last_activity) {}
 
 IRCClient &IRCClient::operator=(const IRCClient &other) {
   if (this != &other) {
     this->nick = other.nick;
     this->username = other.username;
     this->fullname = other.fullname;
+    //this->host = other.host; //no lo copiaba
     this->fd = other.fd;
     this->channelNames = other.channelNames;
     this->flags = other.flags;
+    //Ibuffer = other.Ibuffer; //no lo copiaba
+    //Obuffer = other.Obuffer; //no lo copiaba
+    this->last_activity = other.last_activity;
   }
   return *this;
 }
@@ -268,4 +276,10 @@ void IRCClient::setHost(const std::string & s)
 	host = s;
 }
 
+time_t  IRCClient::getLastActivity(void) const {
+  return (last_activity);
+}
 
+void    IRCClient::updateLastActivity(void){
+  last_activity = std::time(NULL);
+}

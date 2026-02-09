@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/04 15:09:55 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 11:12:44 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,7 +300,7 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         // case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
         // case CMD_NOTICE:   answer_notice(msg, fd);   break;
         case CMD_PING:     answer_ping(msg, fd);     break;
-        // case CMD_PONG:     answer_pong(msg, fd);     break;
+        case CMD_PONG:     answer_pong(msg, fd);     break;
 
         default:
             // (???) Enviar error ERR_UNKNOWNCOMMAND (421) al cliente
