@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
-/*   Updated: 2026/02/08 12:23:34 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 15:48:56 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,11 +144,6 @@ bool IRCChannel::setTopic(const string& nick, const string& newTopic) {
   }
   return false;
 } 
-
-void IRCChannel::sendMessageThrough(IRCMessage& msg) const {
-  // TODO
-  (void)msg;
-}
 
 PairChannelModesIterators IRCChannel::getChannelModesIterators() const {
   return PairChannelModesIterators(
