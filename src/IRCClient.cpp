@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/02/04 10:09:35 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/09 11:04:11 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "IRCClient.hpp"
 #include "IRCMessage.hpp"
 #include "utils.hpp"
+#include <ctime>
 
 IRCClient::IRCClient() : fd(-1) {}
 IRCClient::IRCClient(int fd) : fd(fd) { 
