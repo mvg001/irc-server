@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCMessage.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:44:00 by user1             #+#    #+#             */
-/*   Updated: 2026/02/03 17:22:50 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/08 17:15:26 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,9 @@ public:
   const string& getPrefix() const;
   vectorIteratorPairType getParameters() const;
   vector<string>::size_type getParametersSize() const;
+  const string& getParam(size_t n) const;
   IRCCommand getCommand() const;
+  const string ircMessage() const;
   string toString() const;
 private:
   string prefix;
