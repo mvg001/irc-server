@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:57:30 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 11:12:44 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:21:25 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,6 +279,55 @@ void IRCServ::process_client_buffer(int fd)
 std::string IRCServ::getServerName(void) const{
 	return (server_name);
 }
+
+void	IRCServ::send_ping_to_client(int fd){
+	std::ostringstream msg;
+	
+	if (clients.count(fd)){
+		msg << "PING :" << server_name << "\r\n";
+		queue_and_send(fd, msg.str());
+	}
+}
+
+void	IRCServ::check_clients_timeout(void){
+	time_t	now  = std::time(NULL);
+	using IT = std::map<int, IRCClient>::iterator;
+
+	
+	for (IT it = clients.begin(); it != clients.end();){ //no poner ++it por que segfault
+		int 			fd = it->first;
+		IRCClient &client = it->second;
+		time_t		last = client.getLastActivity();
+		bool			ping_sent = client.get_server_ping_sent();
+		
+		/*If client is TIMEOUT seconds without saying anything server send a PING
+		only should send it once because with epoll can saturate it during those extra 60 sec.*/
+		if (now - last > TIMEOUT && now - last <= TIMEOUT + 60 && !ping_sent){
+			IRCServ::send_ping_to_client(fd);
+			client.set_server_ping_sent();
+			++it;
+		}
+
+		//If it didnt reply to PING with PONG in 60 seconds more we kick it
+		else if (now - last > TIMEOUT + 60){
+			std::ostringstream msg;
+			msg << "ERROR :Closign Link: Ping timeout: "
+			<< (TIMEOUT + 60) << "seconds\r\n";
+			queue_and_send(fd, msg.str());
+
+			//funcion para borrar fd y el fd del map.
+			int fd_to_close = fd;
+			++it;
+			//disconnect_client(fd_to_close) por hacer...
+			(void)fd_to_close;
+		}
+		else
+			++it;
+	}
+}
+
+
+
 
 void IRCServ::answer_command(IRCMessage &msg, int fd)
 {

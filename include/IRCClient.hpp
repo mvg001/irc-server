@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:36:20 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 11:06:38 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:14:27 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,8 @@ public:
 
   time_t  getLastActivity(void) const;
   void    updateLastActivity(void);
+  bool    get_server_ping_sent(void);
+  void    set_server_ping_sent(void);
 
 
 private:
@@ -104,6 +106,7 @@ private:
   std::string Ibuffer;
   std::string Obuffer;
   time_t      last_activity;
+  bool        server_ping_sent;
 };
 
 #endif

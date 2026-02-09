@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 11:13:25 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 11:41:02 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 #include "IRCMessage.hpp"
 
 #define SERVER_NAME "42_irc_server"
+#define TIMEOUT	120 //seconds
 
 class IRCServ {
 public:
@@ -74,6 +75,10 @@ public:
     void					answer_ping(IRCMessage & msg, int fd);
 		void					answer_pong(IRCMessage & msg, int fd);
 
+		//timeout checkout
+		void			send_ping_to_client(int fd);
+		void			check_clients_timeout(void);
+		
 private:
     int listening_socket;
     std::string clientPassword;

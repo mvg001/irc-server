@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 11:22:51 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 12:16:04 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 #include "utils.hpp"
 
 
-IRCClient::IRCClient() : fd(-1), last_activity(std::time(NULL)) {}
-IRCClient::IRCClient(int fd) : fd(fd), last_activity(std::time(NULL)) { 
+IRCClient::IRCClient() : fd(-1), last_activity(std::time(NULL)), server_ping_sent(false) {}
+IRCClient::IRCClient(int fd) : fd(fd), last_activity(std::time(NULL)), server_ping_sent(false) { 
   if (fd < 0) throw std::invalid_argument("invalid file descriptor");
 }
 IRCClient::IRCClient(const IRCClient &other):
@@ -33,7 +33,8 @@ IRCClient::IRCClient(const IRCClient &other):
     flags(other.flags),
     //Ibuffer(other.Ibuffer), //no lo copiaba
     //Obuffer(other.Obuffer), //no lo copiaba
-    last_activity(other.last_activity) {}
+    last_activity(other.last_activity),
+    server_ping_sent(other.server_ping_sent){}
 
 IRCClient &IRCClient::operator=(const IRCClient &other) {
   if (this != &other) {
@@ -47,6 +48,7 @@ IRCClient &IRCClient::operator=(const IRCClient &other) {
     //Ibuffer = other.Ibuffer; //no lo copiaba
     //Obuffer = other.Obuffer; //no lo copiaba
     this->last_activity = other.last_activity;
+    server_ping_sent = other.server_ping_sent;
   }
   return *this;
 }
@@ -282,4 +284,12 @@ time_t  IRCClient::getLastActivity(void) const {
 
 void    IRCClient::updateLastActivity(void){
   last_activity = std::time(NULL);
+}
+
+bool    IRCClient::get_server_ping_sent(void){
+  return (server_ping_sent);
+}
+  
+void    IRCClient::set_server_ping_sent(void){
+  server_ping_sent = true;
 }
