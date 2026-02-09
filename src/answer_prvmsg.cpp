@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 17:20:21 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/09 22:25:39 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/09 22:59:01 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ void	to_user(std::vector<std::string>& msg, int fd, std::string & target, IRCSer
 	
 	//2. search for the creator of the msg to obtain his nick/user/host for the prefix.
 	std::map<int, IRCClient>::const_iterator it_sender = clients.find(fd);
-    if (it_sender == clients.end())
-        return;    
+  if (it_sender == clients.end())
+    return;    
   const IRCClient &sender = it_sender->second;
 
 	//3. construct the reply msg format: :nick!user@host PRIVMSG target :message.
