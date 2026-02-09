@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:44:00 by user1             #+#    #+#             */
-/*   Updated: 2026/02/08 17:15:26 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 10:47:52 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,39 @@ using std::pair;
 typedef pair<vector<string>::const_iterator, vector<string>::const_iterator> vectorIteratorPairType;
 class IRCMessage {
 public:
+  /** Cannonical Orthodox Methods */
 	IRCMessage();
   IRCMessage(const string prefix, const IRCCommand command, vector<string> params);
-  static IRCMessage parse(string& str);
   virtual ~IRCMessage();
   IRCMessage(const IRCMessage& other);
   IRCMessage& operator=(const IRCMessage& other);
+  
+  /** Convert a raw message to an IRCMessage object. 
+  If message cannot be parsed or the command part is not recognized
+  throws std::invalid_argument exception.*/
+  static IRCMessage parse(string& str);
+  
+  /** @returns prefix part of the IRC message */
   const string& getPrefix() const;
+
+  /** @returns a pair of vector<string> iterators corresponding
+  to begin() and end(). */
   vectorIteratorPairType getParameters() const;
+
+  /** @returns the number of parameters found. */
   vector<string>::size_type getParametersSize() const;
+
+  /** @returns the n-th parameter of the list.
+  Throws std::out_of_range exception if the index is invalid */
   const string& getParam(size_t n) const;
+
+  /** @returns the corresponding IRCCommand enum from the message */
   IRCCommand getCommand() const;
+
+  /** @returns a IRC protocol message from its components */
   const string ircMessage() const;
+
+  /** @returns a displayable string with all object fields, use for debugging */
   string toString() const;
 private:
   string prefix;
