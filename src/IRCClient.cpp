@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/10 15:05:13 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/10 15:43:13 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ bool IRCClient::setNick(const std::string& nick) {
 bool IRCClient::isValidNick(const std::string &nick) {
 	if (nick.empty() || nick.length() > MAX_NICK_LENGTH) return false;
 
-	if (!ft_isLetter(nick.at(0)) && !ft_isSpecial(nick.at(0))) return false;
+	if (!ft_isLetter(nick[0]) && !ft_isSpecial(nick[0])) return false;
 
 	std::string::const_iterator it = nick.begin();
 	for (++it; it != nick.end(); ++it) {

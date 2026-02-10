@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:36:20 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 16:03:07 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/10 15:28:49 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ typedef enum {
   USER_FLAG,        // after USER command
   SERVICE_FLAG,     // after SERVICE command
   OPERATOR_FLAG,    // after OPERATOR command
-  REGISTERED_FLAG,  // after PASS, NICK, (USER || SERVICE) commands
+  REGISTERED_FLAG  // after PASS, NICK, (USER || SERVICE) commands
 } FtIRCFlag;
 
 const std::string FtIRCFlagToString(FtIRCFlag flag);

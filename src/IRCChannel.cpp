@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCChannel.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 15:48:56 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/10 15:57:28 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,10 @@ bool IRCChannel::setUserMode(const string& nick, UserMode userMode) {
 
 UserMode IRCChannel::getUserMode(const string& nick) const {
   if (nicks.count(nick) == 0) return UNDEF;
-  return nicks.at(nick);
+	map<string, UserMode>::const_iterator it = nicks.find(nick);
+	if (it == nicks.end())
+		throw std::runtime_error("NO SUCH NICK");
+  return it->second;
 }
 
 PairUserMapIterators IRCChannel::getUsersIterators() const {

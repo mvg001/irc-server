@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCChannel.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 15:41:43 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/10 16:05:37 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ typedef enum {
   INVITE_ONLY,
   TOPIC,
   KEY,
-  USER_LIMIT,  // MODES in subject doc
+  USER_LIMIT  // MODES in subject doc
   // ANONYMOUS,
   // MODERATED,
   // NO_EXTERNAL_USERS,
@@ -49,7 +49,7 @@ const string& channelModeToString(ChannelMode chMode);
 typedef enum {
   UNDEF,
   USER_ONLY,
-  CHANNEL_OPERATOR,
+  CHANNEL_OPERATOR
 } UserMode;
 typedef map<string,UserMode>::const_iterator UserMapIterator;
 typedef pair<UserMapIterator,UserMapIterator> PairUserMapIterators;
