@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/10 10:49:43 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/10 15:06:03 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 
 #include "IRCServ.hpp"
@@ -277,7 +279,6 @@ void IRCServ::process_client_buffer(int fd)
 				try {
 						ircMsg = IRCMessage::parse(raw_line);
 						std::cout << fd << ": " << ircMsg.toString() << std::endl;
-						answer_command(ircMsg, fd);
 				} catch (...) {
 						std::cerr << fd << ": Error parsing => " << raw_line << std::endl;
 				}
@@ -353,7 +354,7 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         // case CMD_KICK:     answer_kick(msg, fd);     break;
         // case CMD_INVITE:   answer_invite(msg, fd);   break;
         // case CMD_TOPIC:    answer_topic(msg, fd);    break;
-        // case CMD_MODE:     answer_mode(msg, fd);     break;
+        case CMD_MODE:     answer_mode(msg, fd);     break;
         case CMD_PASS:     answer_pass(msg, fd);     break;
         case CMD_NICK:     answer_nick(msg, fd);     break;
         case CMD_USER:     answer_user(msg, fd);     break;

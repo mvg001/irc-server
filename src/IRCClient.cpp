@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 16:57:21 by jrollon-         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2026/02/10 15:05:13 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 
 #include <sstream>
@@ -85,6 +86,7 @@ bool IRCClient::isValidNick(const std::string &nick) {
 	}
 	return true;
 }
+
 const std::string& IRCClient::getUsername() const { return username; }
 
 bool IRCClient::setUsername(const std::string& username) {
