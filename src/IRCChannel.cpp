@@ -140,10 +140,11 @@ bool IRCChannel::setUserMode(const string& nick, UserMode userMode) {
 }
 
 UserMode IRCChannel::getUserMode(const string& nick) const {
-  if (nicks.count(nick) == 0) return UNDEF;
+  if (!checkUser(nick)) return UNDEF;
 	map<string, UserMode>::const_iterator it = nicks.find(nick);
-	if (it == nicks.end())
+	if (it == nicks.end()) {
 		throw std::runtime_error("NO SUCH NICK");
+  }
   return it->second;
 }
 
