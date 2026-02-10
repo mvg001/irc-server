@@ -296,3 +296,7 @@ bool    IRCClient::get_server_ping_sent(void){
 void    IRCClient::set_server_ping_sent(void){
   server_ping_sent = true;
 }
+
+const std::set<std::string>& IRCClient::getChannelNames() const {
+  return channelNames;
+}
