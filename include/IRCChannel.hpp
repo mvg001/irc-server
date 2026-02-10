@@ -13,6 +13,7 @@
 #ifndef IRCCHANNEL_HPP
 #define IRCCHANNEL_HPP
 #include "IRCMessage.hpp"
+#include <cstddef>
 #include <string>
 #include <set>
 #include <map>
@@ -23,6 +24,7 @@ using std::set;
 using std::pair;
 
 typedef enum {
+  ADD_USER_OK,  // Invalid in Mode only used as a return value in addUser
   INVITE_ONLY,
   TOPIC,
   KEY,
@@ -82,8 +84,17 @@ const static unsigned MAX_NAME_LENGTH = 50;
   bool checkUser(const string& nick) const;
   
   /** Add/Del user to this channel 
-  @returns {bool} true if the operation was performed */
-  bool addUser(const string& nick, UserMode userMode = USER_ONLY);
+  @returns ADD_USER_OK if the operation was performed 
+  If channel is key protected and supplied userKey != channelKey 
+    returns KEY
+  
+  If channel has a limited number of users and the limit is reached
+    returns USER_LIMIT
+
+  If channel is invite only and user is not in the inveted list
+    return INVITE_ONLY 
+  */
+  ChannelMode addUser(const string& nick, UserMode userMode = USER_ONLY, const string& userKey = "");
   bool delUser(const string& nick);
   
   /** Delete all users from this channel, this means this 
@@ -144,11 +155,11 @@ const static unsigned MAX_NAME_LENGTH = 50;
   
   /** @returns the maximum number of users subscribed to this channel.
   Only active if this channel has USER_LIMIT mode set */
-  unsigned getUserLimit() const;
+  size_t getUserLimit() const;
 
   /** Sets the maximum number of users subscribed to this channel.
   Only active if this channel has USER_LIMIT mode set */
-  void setUserLimit(unsigned userLimit);
+  void setUserLimit(size_t userLimit);
 
   /** @returns {const string&} current topic for the channel */
   const string& getTopic() const;
@@ -180,7 +191,7 @@ private:
 	map<string, UserMode> nicks; // nick => UserMode
   string key;                       // password to join the channel
   set<ChannelMode> channelModes;
-  unsigned userLimit;               // max number of clients
+  size_t userLimit;                 // max number of clients
   string topic;                     // current channel topic
   set<string> invitedNicks;         // nicks invited
 };

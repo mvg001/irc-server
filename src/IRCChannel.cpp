@@ -12,6 +12,7 @@
 
 #include "IRCChannel.hpp"
 #include "utils.hpp"
+#include <cstddef>
 #include <sstream>
 #include <stdexcept>
 
@@ -103,10 +104,25 @@ bool IRCChannel::checkUser(const string& nick) const {
   return nicks.find(nick) != nicks.end();
 }
 
-bool IRCChannel::addUser(const string& nick, UserMode userMode) {
-  if (checkUser(nick)) return false;
-  nicks[nick] = nicks.empty()? CHANNEL_OPERATOR : userMode;
-  return true;
+ChannelMode IRCChannel::addUser(
+  const string& nick, 
+  UserMode userMode, 
+  const string& userKey) {
+  if (checkUser(nick)) return ADD_USER_OK;
+  if (nicks.empty()) {
+    nicks[nick] = CHANNEL_OPERATOR;
+    return ADD_USER_OK;
+  }
+  if (checkChannelMode(USER_LIMIT) && nicks.size() >= userLimit)
+    return USER_LIMIT;
+  if (checkChannelMode(INVITE_ONLY) && !checkInvitedNick(nick)) {
+    return INVITE_ONLY;
+  }
+  if (checkChannelMode(KEY) && (key != userKey)) {
+    return KEY;
+  }
+  nicks[nick] = userMode;
+  return ADD_USER_OK;
 }
 
 bool IRCChannel::delUser(const string& nick) {
@@ -145,14 +161,17 @@ void IRCChannel::setKey(const string& key) {
 }
 
 bool IRCChannel::checkChannelMode(const ChannelMode chMode) const {
+  if (chMode == ADD_USER_OK) return false;
   return channelModes.find(chMode) != channelModes.end();
 }
 
 bool IRCChannel::setChannelMode(const ChannelMode chMode) {
+  if (chMode == ADD_USER_OK) return false;
   return channelModes.insert(chMode).second;
 }
 
 bool IRCChannel::unsetChannelMode(const ChannelMode chMode) {
+  if (chMode == ADD_USER_OK) return false;
   return channelModes.erase(chMode) != 0;
 }
 
@@ -174,11 +193,11 @@ PairChannelModesIterators IRCChannel::getChannelModesIterators() const {
     channelModes.begin(), channelModes.end());
 }
 
-unsigned IRCChannel::getUserLimit() const {
+size_t IRCChannel::getUserLimit() const {
   return userLimit;
 }
 
-void IRCChannel::setUserLimit(unsigned userLimit) {
+void IRCChannel::setUserLimit(size_t userLimit) {
   this->userLimit = userLimit;
 }
 
