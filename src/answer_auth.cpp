@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   answers.cpp                                        :+:      :+:    :+:   */
+/*   answer_auth.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/04 15:34:32 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/10 14:46:16 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/10 16:54:38 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,6 @@ void IRCServ::answer_user(IRCMessage & msg, int fd)
 		queue_and_send(fd, welcome);
 	}
 }
-
 
 void IRCServ::queue_and_send(int fd, std::string data)
 {
