@@ -15,8 +15,9 @@
 #include <sstream>
 #include <stdexcept>
 
-IRCChannel::IRCChannel(): name("invalid"), userLimit(0) {}
+IRCChannel::IRCChannel(): name("INVALID_NAME"), userLimit(0) {}
 
+/** the channel name is stored in lower case */
 IRCChannel::IRCChannel(const std::string& name) {
   if (!isValidName(name))
     throw std::invalid_argument("invalid channel name");
@@ -30,7 +31,9 @@ IRCChannel::IRCChannel(const IRCChannel& other):
   nicks(other.nicks),
   key(other.key),
   channelModes(other.channelModes),
-  userLimit(other.userLimit) {}
+  userLimit(other.userLimit),
+  topic(other.topic),
+  invitedNicks(other.invitedNicks) {}
 
   IRCChannel& IRCChannel::operator=(const IRCChannel& other) {
   if (this != &other) {
@@ -39,6 +42,8 @@ IRCChannel::IRCChannel(const IRCChannel& other):
     key = other.key;
     channelModes = other.channelModes;
     userLimit = other.userLimit;
+    topic = other.topic;
+    invitedNicks = other.invitedNicks;
   }
   return *this;
 }
@@ -50,7 +55,7 @@ bool IRCChannel::isValidName(const std::string &name) {
   if (name.length() > MAX_NAME_LENGTH) return false;
   // must start with any of "#&+", safe channels starting with '!'
   // are not implemented
-  static const std::string VALID_PREFIX = "#&+";  
+  static const std::string VALID_PREFIX = "#&+!";  
   if (VALID_PREFIX.find_first_of(name[0]) == std::string::npos)
     return false;
   // must not have any of chars " ,:\x07"
@@ -60,6 +65,26 @@ bool IRCChannel::isValidName(const std::string &name) {
     if (name.find_first_of(*it) != std::string::npos)
       return false;
   return true;
+}
+
+bool IRCChannel::operator==(const IRCChannel& rhs) const {
+  return name == rhs.name;
+}
+
+bool IRCChannel::operator<(const IRCChannel& rhs) const {
+  return name < rhs.name;
+}
+
+bool IRCChannel::operator>(const IRCChannel& rhs) const {
+  return rhs.name < name;
+}
+
+bool IRCChannel::operator<=(const IRCChannel& rhs) const {
+  return !(name > rhs.name);
+}
+
+bool IRCChannel::operator>=(const IRCChannel& rhs) const {
+  return !(name < rhs.name);
 }
 
 const string& IRCChannel::getName() const {
@@ -75,12 +100,11 @@ bool IRCChannel::setName(const std::string& name) {
 }
 
 bool IRCChannel::checkUser(const string& nick) const {
-  return nicks.count(nick) != 0;
+  return nicks.find(nick) != nicks.end();
 }
 
 bool IRCChannel::addUser(const string& nick, UserMode userMode) {
-  if (nicks.count(nick) != 0)
-    return false;
+  if (checkUser(nick)) return false;
   nicks[nick] = nicks.empty()? CHANNEL_OPERATOR : userMode;
   return true;
 }
@@ -121,7 +145,7 @@ void IRCChannel::setKey(const string& key) {
 }
 
 bool IRCChannel::checkChannelMode(const ChannelMode chMode) const {
-  return channelModes.count(chMode) != 0;
+  return channelModes.find(chMode) != channelModes.end();
 }
 
 bool IRCChannel::setChannelMode(const ChannelMode chMode) {
@@ -170,13 +194,20 @@ std::string IRCChannel::toString() const {
       << it->first << "', "
       << userModeToString(it->second) << ')';
   }
-  buf << "]";
+  buf << ']';
   buf << ", key=\"" << key << "\", userLimit=" << userLimit
     << ", channelModes=[";
   for (set<ChannelMode>::const_iterator it = channelModes.begin();
     it != channelModes.end(); ++it) {
     if (it != channelModes.begin()) buf << ", ";
     buf << channelModeToString(*it);    
+  }
+  buf << ']';
+  buf << ", invitedNicks=[";
+  for (set<string>::const_iterator it = invitedNicks.begin();
+    it != invitedNicks.end(); ++it) {
+    if (it != invitedNicks.begin()) buf << ", ";
+    buf << *it;
   }
   buf << ']';
   return buf.str();
@@ -201,4 +232,20 @@ const string& userModeToString(UserMode uMode) {
     m[CHANNEL_OPERATOR] = "CHANNEL_OPERATOR";
   }
   return m[uMode];
+}
+
+bool IRCChannel::addInvitedNick(const string& nick) {
+  return invitedNicks.insert(nick).second;
+}
+
+bool IRCChannel::checkInvitedNick(const string& nick) const {
+  return invitedNicks.find(nick) != invitedNicks.end();
+}
+
+bool IRCChannel::delInvitedNick(const string& nick) {
+  return invitedNicks.erase(nick) > 0;
+}
+
+void IRCChannel::delAllInvitedNicks() {
+  invitedNicks.clear();
 }

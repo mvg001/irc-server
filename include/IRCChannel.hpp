@@ -72,6 +72,12 @@ const static unsigned MAX_NAME_LENGTH = 50;
   const string& getName() const;
   bool setName(const string& name);
   
+  bool operator==(const IRCChannel& rhs) const;
+  bool operator<(const IRCChannel& rhs) const;
+  bool operator>(const IRCChannel& rhs) const;
+  bool operator<=(const IRCChannel& rhs) const;
+  bool operator>=(const IRCChannel& rhs) const;
+
   /** Check user belongs to this Channel */
   bool checkUser(const string& nick) const;
   
@@ -157,12 +163,25 @@ const static unsigned MAX_NAME_LENGTH = 50;
   * @returns {std::string} with the contents of the object */
   string toString() const;
 
+  /** Add an invited nick, @returns false if nick already invited */
+  bool addInvitedNick(const string& nick);
+
+  /** Check if a nick was invited */
+  bool checkInvitedNick(const string& nick) const;
+
+  /** Del nick from invited list, @returns false if nick was invited */
+  bool delInvitedNick(const string& nick);
+
+  /** Del all nicks from invited list */
+  void delAllInvitedNicks();
+
 private:
   string name;     // channel name
-	map<std::string, UserMode> nicks; // nick => UserMode
+	map<string, UserMode> nicks; // nick => UserMode
   string key;                       // password to join the channel
   set<ChannelMode> channelModes;
   unsigned userLimit;               // max number of clients
   string topic;                     // current channel topic
+  set<string> invitedNicks;         // nicks invited
 };
 #endif
