@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/10 15:43:13 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/10 16:57:32 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,8 @@ bool IRCClient::isValidUsername(const std::string &username) {
 
 const std::string& IRCClient::getFullname() const { return fullname; }
 bool IRCClient::setFullname(const std::string& fullname) {
-  if (!isValidFullname(fullname)) return false;
+  if (!isValidFullname(fullname))
+		return false;
   this->fullname = fullname;
   return true;
 }
