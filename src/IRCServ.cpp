@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/09 20:53:10 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/10 10:49:43 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,8 +334,14 @@ void	IRCServ::check_clients_timeout(void){
 	}
 }
 
+//privmsg
 const std::map<const std::string, int>&	IRCServ::getNicks(void) const{
 	return (nicks);
+}
+
+//privmsg
+const std::map<const string, IRCChannel>& IRCServ::getChannels(void) const{
+	return (channels);
 }
 
 
