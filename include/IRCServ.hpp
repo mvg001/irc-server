@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 16:05:45 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/10 11:24:02 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,13 @@ public:
 		void 			answer_join(IRCMessage & msg, int fd);
 		void 			answer_part(IRCMessage & msg, int fd);	
 		void			answer_pong(IRCMessage & msg, int fd);
+		void			answer_mode(IRCMessage & msg, int fd);
 
 		//timeout checkout
 		void			send_ping_to_client(int fd);
 		void			check_clients_timeout(void);
-		
+
+
 private:
     int listening_socket;
     std::string clientPassword;

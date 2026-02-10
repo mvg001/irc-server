@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 10:45:05 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 16:07:47 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/10 11:27:46 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,11 @@ IRCClient::IRCClient(const IRCClient &other):
     nick(other.nick), 
     username(other.username), 
     fullname(other.fullname),
-    //host(other.host), //no se estaba compiando
+    host(other.host), //no se estaba compiando
     channelNames(other.channelNames), 
     flags(other.flags),
-    //Ibuffer(other.Ibuffer), //no lo copiaba
-    //Obuffer(other.Obuffer), //no lo copiaba
+    Ibuffer(other.Ibuffer), //no lo copiaba
+    Obuffer(other.Obuffer), //no lo copiaba
     last_activity(other.last_activity),
     server_ping_sent(other.server_ping_sent){}
 
@@ -41,12 +41,12 @@ IRCClient &IRCClient::operator=(const IRCClient &other) {
     this->nick = other.nick;
     this->username = other.username;
     this->fullname = other.fullname;
-    //this->host = other.host; //no lo copiaba
+    this->host = other.host; //no lo copiaba
     this->fd = other.fd;
     this->channelNames = other.channelNames;
     this->flags = other.flags;
-    //Ibuffer = other.Ibuffer; //no lo copiaba
-    //Obuffer = other.Obuffer; //no lo copiaba
+    Ibuffer = other.Ibuffer; //no lo copiaba
+    Obuffer = other.Obuffer; //no lo copiaba
     this->last_activity = other.last_activity;
     server_ping_sent = other.server_ping_sent;
   }
@@ -85,6 +85,7 @@ bool IRCClient::isValidNick(const std::string &nick) {
 	}
 	return true;
 }
+
 const std::string& IRCClient::getUsername() const { return username; }
 
 bool IRCClient::setUsername(const std::string& username) {

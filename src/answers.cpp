@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   answers.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/04 15:34:32 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/07 10:58:13 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/10 14:46:16 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,11 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 
 	if (!IRCClient::isValidNick(new_nick)) {
 		std::string err = ":server 432 * " + new_nick + " :Erroneous nickname\r\n";
+		std::cout << "errrrrrrrrrrouneououousssssssssssssssssssssssssssssss" << std::endl;
 		queue_and_send(fd, err);
 		return;
 	}
-	if (!nickIsUnique(new_nick)) {
+	if (!nickIsUnique(new_nick) && nicks[new_nick] != fd) {
 		std::string err = ":server 433 * " + new_nick + " :Nickname is already in use\r\n";
 		queue_and_send(fd, err);
 		return;
@@ -90,8 +91,7 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 		rmFromNicks(old_nick);
 		std::string msg = ":" + old_nick + "!" + clients[fd].getUsername() + "@" + clients[fd].getHost() + " NICK " + new_nick + "\r\n";
 		queue_and_send(fd, msg);
-		//aqui haríamos broadcast a todos los canales
-		//broadcast(fd, msg);
+		broadcast(fd, msg);
 	}
 	else if (clients[fd].checkFlag(NICK_FLAG) && clients[fd].checkFlag(USER_FLAG) && clients[fd].checkFlag(PASS_FLAG)) 
 	{
@@ -149,7 +149,7 @@ void IRCServ::queue_and_send(int fd, std::string data)
     ev.data.fd = fd;
     ev.events = EPOLLIN | EPOLLET;
     if (!buffer.empty())
-        ev.events |= EPOLLOUT;
+      ev.events |= EPOLLOUT;
 
     epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &ev);
 }
