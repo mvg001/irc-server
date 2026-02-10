@@ -97,7 +97,6 @@ public:
   bool    get_server_ping_sent(void);
   void    set_server_ping_sent(void);
 
-
 private:
   int fd;
   std::string nick;
