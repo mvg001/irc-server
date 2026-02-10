@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   answer_prvmsg.cpp                                  :+:      :+:    :+:   */
+/*   answer_privmsg.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 17:20:21 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/10 14:46:04 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/10 17:16:04 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "IRCServ.hpp"
 #include <sstream>
 
-void	to_user(std::vector<std::string>& msg, int fd, std::string & target, IRCServ& server){
+static void	to_user(std::vector<std::string>& msg, int fd, std::string & target, IRCServ& server){
 	const std::map<int, IRCClient>&						clients	= server.getClients(); //have all the clients
 	const std::map<const std::string, int>&		nicks		= server.getNicks();
 	std::ostringstream												reply;
@@ -62,7 +62,7 @@ void	to_user(std::vector<std::string>& msg, int fd, std::string & target, IRCSer
 	}
 }
 
-void	to_channel(std::vector<std::string>& msg, int fd, std::string & target, IRCServ& server){
+static void	to_channel(std::vector<std::string>& msg, int fd, std::string & target, IRCServ& server){
 	//target = target.substr(1); //I need the prefix because #myChannel is different than !myChannel.
 	
 	//obtain the channels objects from server.

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/10 15:03:46 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/10 17:04:36 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ public:
 		void			answer_pong(IRCMessage & msg, int fd);
 		void			answer_privmsg(IRCMessage & msg, int fd);
 		void			answer_mode(IRCMessage & msg, int fd);
+		void			answer_notice(IRCMessage & msg, int fd);
 
 		//timeout checkout
 		void			send_ping_to_client(int fd);
