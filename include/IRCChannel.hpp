@@ -101,6 +101,9 @@ const static unsigned MAX_NAME_LENGTH = 50;
   channel should cease to exist */
   void clearUsers();
 
+  /** @returns a reference to map of nicks */
+  const map<string, UserMode>& getNicksMap() const;
+
   /** Set a UserMode to a particular user in this channel, 
   if this is the first user added it is automatically made 
   CHANNEL_OPERATOR */
@@ -153,6 +156,9 @@ const static unsigned MAX_NAME_LENGTH = 50;
   */
   PairChannelModesIterators getChannelModesIterators() const;
   
+  /** @returns a const reference to the set of ChannelModes */
+  const set<ChannelMode>& getChannelModes() const;
+
   /** @returns the maximum number of users subscribed to this channel.
   Only active if this channel has USER_LIMIT mode set */
   size_t getUserLimit() const;
@@ -185,6 +191,9 @@ const static unsigned MAX_NAME_LENGTH = 50;
 
   /** Del all nicks from invited list */
   void delAllInvitedNicks();
+
+  /** @returns invited nicks set */
+  const set<string>& getInvitedNicks() const;
 
 private:
   string name;     // channel name

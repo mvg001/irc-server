@@ -95,8 +95,9 @@ const string& IRCChannel::getName() const {
 bool IRCChannel::setName(const std::string& name) {
   if (!isValidName(name))
     return false;
-  this->name = name;
-  ft_toLower(this->name);
+  std::string aux = name;
+  ft_toLower(aux);
+  this->name = aux;
   return true;
 }
 
@@ -118,7 +119,7 @@ ChannelMode IRCChannel::addUser(
   if (checkChannelMode(INVITE_ONLY) && !checkInvitedNick(nick)) {
     return INVITE_ONLY;
   }
-  if (checkChannelMode(KEY) && (key != userKey)) {
+  if (checkChannelMode(KEY) && (userKey != key)) {
     return KEY;
   }
   nicks[nick] = userMode;
@@ -271,4 +272,16 @@ bool IRCChannel::delInvitedNick(const string& nick) {
 
 void IRCChannel::delAllInvitedNicks() {
   invitedNicks.clear();
+}
+
+const set<ChannelMode>& IRCChannel::getChannelModes() const {
+  return channelModes;
+}
+
+const map<string, UserMode>& IRCChannel::getNicksMap() const {
+  return nicks;
+}
+
+const set<string>& IRCChannel::getInvitedNicks() const {
+  return invitedNicks;
 }
