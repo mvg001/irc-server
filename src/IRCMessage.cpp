@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCMessage.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 11:55:03 by user1             #+#    #+#             */
-/*   Updated: 2026/02/08 17:23:54 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 21:18:03 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,4 +219,9 @@ const string IRCMessage::ircMessage() const {
   if (parameters.size() != 0)
     oss << " :" << parameters.back();
   return oss.str();
+}
+
+//for privmsg
+const std::vector<std::string>& IRCMessage::getParamsVector() const{
+  return (parameters);
 }

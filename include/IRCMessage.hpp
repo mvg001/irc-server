@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCMessage.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:44:00 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 10:47:52 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/09 21:16:45 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,9 @@ public:
   /** @returns the n-th parameter of the list.
   Throws std::out_of_range exception if the index is invalid */
   const string& getParam(size_t n) const;
+  
+  //for privmsg
+  const std::vector<std::string>& getParamsVector() const;
 
   /** @returns the corresponding IRCCommand enum from the message */
   IRCCommand getCommand() const;

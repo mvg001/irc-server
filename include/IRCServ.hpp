@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/28 14:52:51 by user1             #+#    #+#             */
-/*   Updated: 2026/02/09 16:05:45 by mvassall         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2026/02/10 15:03:46 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef IRCSERV_HPP
 #define IRCSERV_HPP
@@ -51,7 +52,8 @@ public:
 		bool															nickIsUnique(const string & n);
 		int 															getFdFromNick(string s);
 		std::string												getServerName(void) const;
-
+		const std::map<const std::string, int>&	getNicks(void) const; //For privmsg
+		const std::map<const string, IRCChannel>& getChannels(void) const; //privmsg
 		
 		void			run();
 		void			process_client_buffer(int fd);
@@ -69,11 +71,14 @@ public:
 		void 			answer_join(IRCMessage & msg, int fd);
 		void 			answer_part(IRCMessage & msg, int fd);	
 		void			answer_pong(IRCMessage & msg, int fd);
+		void			answer_privmsg(IRCMessage & msg, int fd);
+		void			answer_mode(IRCMessage & msg, int fd);
 
 		//timeout checkout
 		void			send_ping_to_client(int fd);
 		void			check_clients_timeout(void);
-		
+
+
 private:
     int listening_socket;
     std::string clientPassword;

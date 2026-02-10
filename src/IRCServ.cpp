@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/09 16:11:02 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/10 15:06:03 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 
 #include "IRCServ.hpp"
@@ -333,7 +335,15 @@ void	IRCServ::check_clients_timeout(void){
 	}
 }
 
+//privmsg
+const std::map<const std::string, int>&	IRCServ::getNicks(void) const{
+	return (nicks);
+}
 
+//privmsg
+const std::map<const string, IRCChannel>& IRCServ::getChannels(void) const{
+	return (channels);
+}
 
 
 void IRCServ::answer_command(IRCMessage &msg, int fd)
@@ -344,7 +354,7 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         // case CMD_KICK:     answer_kick(msg, fd);     break;
         // case CMD_INVITE:   answer_invite(msg, fd);   break;
         // case CMD_TOPIC:    answer_topic(msg, fd);    break;
-        // case CMD_MODE:     answer_mode(msg, fd);     break;
+        case CMD_MODE:     answer_mode(msg, fd);     break;
         case CMD_PASS:     answer_pass(msg, fd);     break;
         case CMD_NICK:     answer_nick(msg, fd);     break;
         case CMD_USER:     answer_user(msg, fd);     break;
@@ -353,7 +363,7 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         // // === extras ===
         case CMD_JOIN:     answer_join(msg, fd);     break;
         case CMD_PART:     answer_part(msg, fd);     break;
-        // case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
+        case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
         // case CMD_NOTICE:   answer_notice(msg, fd);   break;
         case CMD_PING:     answer_ping(msg, fd);     break;
         case CMD_PONG:     answer_pong(msg, fd);     break;
