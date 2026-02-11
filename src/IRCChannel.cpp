@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
-/*   Updated: 2026/02/11 11:43:54 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/11 12:20:14 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,9 @@
 #include <sstream>
 #include <stdexcept>
 
-IRCChannel::IRCChannel(): name("INVALID_NAME"), userLimit(0) {}
+IRCChannel::IRCChannel(): name("INVALID_NAME"), userLimit(0) {
+  creationTime = std::time(NULL);
+}
 
 /** the channel name is stored in lower case */
 IRCChannel::IRCChannel(const std::string& name) {
@@ -25,6 +27,7 @@ IRCChannel::IRCChannel(const std::string& name) {
   this->name = name;
   ft_toLower(this->name);
   userLimit = 0;
+  creationTime = std::time(NULL);
 }
 
 IRCChannel::IRCChannel(const IRCChannel& other):
@@ -219,7 +222,9 @@ std::string IRCChannel::toString() const {
       << userModeToString(it->second) << ')';
   }
   buf << ']';
-  buf << ", key=\"" << key << "\", userLimit=" << userLimit
+  buf << ", key=\"" << key << "\""
+    << ", userLimit=" << userLimit
+    << ", creationTime=" << creationTime
     << ", channelModes=[";
   for (set<ChannelMode>::const_iterator it = channelModes.begin();
     it != channelModes.end(); ++it) {
@@ -240,6 +245,10 @@ std::string IRCChannel::toString() const {
 const string& channelModeToString(ChannelMode chMode) {
   static map<ChannelMode,string> m;
   if (m.empty()) {
+    m[INVITE_ONLY] = "i";
+    m[TOPIC] = "t";
+    m[KEY] = "k";
+    m[USER_LIMIT] = "l";
     m[INVITE_ONLY] = "i";
     m[TOPIC] = "t";
     m[KEY] = "k";
@@ -284,4 +293,9 @@ const map<string, UserMode>& IRCChannel::getNicksMap() const {
 
 const set<string>& IRCChannel::getInvitedNicks() const {
   return invitedNicks;
+}
+
+
+size_t IRCChannel::getCreationTime() const {
+  return creationTime;
 }
