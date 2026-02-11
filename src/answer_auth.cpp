@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/04 15:34:32 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/11 15:48:25 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/11 15:54:48 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,4 +166,7 @@ void IRCServ::sendWelcome(int fd)
 
     std::string rpl004 = ":" + sName + " 004 " + nick + " " + sName + " 1.0 i ntklo\r\n";
     queue_and_send(fd, rpl004);
+
+		std::string rpl376 = ":" + sName + " 376 " + nick + " :End of /MOTD command.\r\n";
+		queue_and_send(fd, rpl376);
 }
