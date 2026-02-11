@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
-/*   Updated: 2026/02/11 12:28:07 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/11 14:28:46 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,14 @@ IRCChannel::IRCChannel(): name("INVALID_NAME"), userLimit(0) {
 }
 
 /** the channel name is stored in lower case */
-IRCChannel::IRCChannel(const std::string& name) {
+IRCChannel::IRCChannel(const string& name, const string& creatorNick) {
   if (!isValidName(name))
     throw std::invalid_argument("invalid channel name");
   this->name = name;
   ft_toLower(this->name);
   userLimit = 0;
   creationTime = std::time(NULL);
+  this->creatorNick = creatorNick;
 }
 
 IRCChannel::IRCChannel(const IRCChannel& other):
@@ -38,7 +39,8 @@ IRCChannel::IRCChannel(const IRCChannel& other):
   userLimit(other.userLimit),
   topic(other.topic),
   invitedNicks(other.invitedNicks),
-  creationTime(other.creationTime) {}
+  creationTime(other.creationTime),
+  creatorNick(other.creatorNick) {}
 
   IRCChannel& IRCChannel::operator=(const IRCChannel& other) {
   if (this != &other) {
@@ -50,6 +52,7 @@ IRCChannel::IRCChannel(const IRCChannel& other):
     topic = other.topic;
     invitedNicks = other.invitedNicks;
     creationTime = other.creationTime;
+    creatorNick = other.creatorNick;
   }
   return *this;
 }
@@ -227,6 +230,7 @@ std::string IRCChannel::toString() const {
   buf << ", key=\"" << key << "\""
     << ", userLimit=" << userLimit
     << ", creationTime=" << creationTime
+    << ", creatorNick=" << creatorNick
     << ", channelModes=[";
   for (set<ChannelMode>::const_iterator it = channelModes.begin();
     it != channelModes.end(); ++it) {
@@ -295,4 +299,12 @@ const set<string>& IRCChannel::getInvitedNicks() const {
 
 size_t IRCChannel::getCreationTime() const {
   return creationTime;
+}
+
+const string& IRCChannel::getCreatorNick() const {
+  return creatorNick;
+}
+
+void IRCChannel::setCreatorNick(const string& nick) {
+  creatorNick = nick;
 }

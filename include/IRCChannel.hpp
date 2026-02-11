@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/02/11 12:02:31 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/11 14:27:44 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ public:
 const static unsigned MAX_NAME_LENGTH = 50;
 
   IRCChannel();
-	IRCChannel(const string& name);
+	IRCChannel(const string& name, const string& creatorNick);
   IRCChannel(const IRCChannel& other);
   IRCChannel& operator=(const IRCChannel& other);
   virtual ~IRCChannel();
@@ -199,7 +199,13 @@ const static unsigned MAX_NAME_LENGTH = 50;
   /** @returns {time_t} creation time stamp */
   size_t getCreationTime() const;
   
-private:
+  /** @return {string&} creator nick */
+  const string& getCreatorNick() const;
+
+  /** set creator nick */
+  void setCreatorNick(const string& nick);
+  
+private: 
   string name;            // channel name
 	map<string, UserMode> nicks;    // nick => UserMode
   string key;                     // password to join the channel
@@ -208,5 +214,6 @@ private:
   string topic;                   // current channel topic
   set<string> invitedNicks;       // nicks invited
   std::time_t creationTime;       // creation timestamp epoch
+  string creatorNick;
 };
 #endif
