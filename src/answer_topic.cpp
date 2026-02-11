@@ -36,10 +36,10 @@ void IRCServ::answer_topic(IRCMessage & msg, int fd)
 													+ " TOPIC " + ch_name + " :" + new_topic + "\r\n";
 				this->broadcastToChannel(channel, alert);
 		}
-		else 
+		else
 		{
 				std::string current_topic = channel.getTopic();
-				if (current_topic.empty()) 
+				if (current_topic.empty())
 					queue_and_send(fd, ":" + server_name + " 331 " + nick + " " + ch_name + " :No topic is set\r\n");
 					// RPL_NOTOPIC (331)
 				else 

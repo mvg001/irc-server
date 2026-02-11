@@ -4,6 +4,7 @@
 #include "IRCClient.hpp"
 #include "IRCChannel.hpp"
 #include <sstream>
+#include <iostream>
 
 void IRCServ::answer_mode(IRCMessage & msg, int fd) {
 	if (msg.getParametersSize() < 2) {
@@ -14,7 +15,9 @@ void IRCServ::answer_mode(IRCMessage & msg, int fd) {
 	}
 
 	std::string target = msg.getParam(0);
-	std::string flags = msg.getParam(1);
+	std::string flags;
+	if (msg.getParametersSize() != 2) 
+		flags = msg.getParam(1);
 
 	if (target[0] == '#' || target[0] == '&' || target[0] == '+' || target[0] == '!') {
 		// ----- MODO CANAL -----
@@ -25,6 +28,11 @@ void IRCServ::answer_mode(IRCMessage & msg, int fd) {
 			return;
 		}
 		IRCChannel& channel = channels[target];
+		if (msg.getParametersSize() == 2)
+		{
+			std::cout << channel.toString() << std::endl;
+			return;
+		}
 
 		if (!channel.checkUser(clients[fd].getNick())) {
 			// ERR_NOTONCHANNEL
