@@ -14,8 +14,6 @@
 #include "IRCServ.hpp"
 #include "IRCMessage.hpp"
 #include "utils.hpp"
-#include <sstream>
-#include <vector>
 
 /* static const string genPartChannel(const IRCClient& client,
     const string& channelName, const string& reason) {
@@ -38,7 +36,7 @@ void 	IRCServ::answer_part(IRCMessage & msg, int fd) {
   size_t nParams = msg.getParametersSize();
   if (nParams == 0) { // not enough parameters
     queue_and_send(fd,
-      genErrNeedMoreParams(server_name, client.getNick()));
+      genSyntaxError(server_name, client.getNick(), "PART"));
     return;
   }
   vector<string> channelNames = split(msg.getParam(0),",");
