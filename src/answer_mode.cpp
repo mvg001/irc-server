@@ -49,11 +49,11 @@ void IRCServ::answer_mode(IRCMessage & msg, int fd) {
 			// Formato: :<server> 329 <nick> <target> <timestamp>
 			// Ejemplo: :localhost 329 marcog #test 1676112000
 
-			// std::stringstream rpl329;
-			// rpl329 << ":" << server << " 329 " << nick << " " << target << " " 
-			// 			<< channel.getCreationTime() << "\r\n"; // Timestamp en segundos (long)
+			std::stringstream rpl329;
+			rpl329 << ":" << server << " 329 " << nick << " " << target << " " 
+						<< channel.getCreationTime() << "\r\n"; // Timestamp en segundos (long)
 
-			// queue_and_send(fd, rpl329.str());
+			queue_and_send(fd, rpl329.str());
 
 			std::cout << channel.toString() << std::endl;
 			return;
