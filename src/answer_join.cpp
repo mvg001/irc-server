@@ -18,7 +18,6 @@
 #include "utils.hpp"
 #include <sstream>
 #include <string>
-#include <vector>
 
 
 static void join0(const IRCClient& client, int fd) {
@@ -140,6 +139,18 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
         for (UserMapIterator kvIt = pairIterators.first;
               kvIt != pairIterators.second; ++kvIt) {
           subscribedNick = kvIt->first;
+          if (subscribedNick != client.getNick() 
+            && nicks.find(subscribedNick) != nicks.end()) {
+            int fd = nicks[subscribedNick];
+            if (clients.find(fd) != clients.end()) {
+              IRCClient mClient = clients[fd];
+              msg.clear(); // :japo!~javier@lenovo-i5 JOIN :#tst
+              msg << ':' << mClient.getNick() << '!' << mClient.getUsername()
+                << '@' << mClient.getHost() << " JOIN :" 
+                << channelName << "\r\n";
+                queue_and_send(client.getFd(), msg.str());
+            }
+          }
           subscribedUserMode = kvIt->second;
           msg.clear();
           //:ngircd.none.net 353 n02 = #test :n02 @n01    #  RPL_NAMREPLY
