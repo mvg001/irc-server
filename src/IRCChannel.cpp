@@ -6,7 +6,7 @@
 /*   By: mvassall <mvassall@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
-/*   Updated: 2026/02/11 12:03:09 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/11 12:28:07 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ IRCChannel::IRCChannel(const IRCChannel& other):
   channelModes(other.channelModes),
   userLimit(other.userLimit),
   topic(other.topic),
-  invitedNicks(other.invitedNicks) {}
+  invitedNicks(other.invitedNicks),
+  creationTime(other.creationTime) {}
 
   IRCChannel& IRCChannel::operator=(const IRCChannel& other) {
   if (this != &other) {
@@ -48,6 +49,7 @@ IRCChannel::IRCChannel(const IRCChannel& other):
     userLimit = other.userLimit;
     topic = other.topic;
     invitedNicks = other.invitedNicks;
+    creationTime = other.creationTime;
   }
   return *this;
 }
