@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 12:42:05 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/10 15:29:05 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/11 11:22:47 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,52 +115,43 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
     }
     std::ostringstream buf;
     string subscribedNick;
-    UserMode subscribedUserMode;
+    // UserMode subscribedUserMode;
     PairUserMapIterators pairIterators = ircChannel.getUsersIterators();
     switch (ircChannel.addUser(newJoinClient.getNick(),USER_ONLY,key)) {
     case ADD_USER_OK:
-      // :n01!~user1@lenovo-i5 JOIN :#test
-      buf.clear();
-      buf << ':' << newJoinClient.getNick() 
-        << '!' << newJoinClient.getUsername()
-        << '@' << newJoinClient.getHost()
-        << " JOIN :" << channelName << "\r\n";
-      queue_and_send(newJoinClient.getFd(), buf.str());
-      buf.clear();
-      // :ngircd.none.net 332 n02 #test :Channel usage # RPL_TOPIC
-      buf << ':' << server_name << " 332 " << newJoinClient.getNick()
-        << " :" << ircChannel.getTopic() << "\r\n";
-      queue_and_send(newJoinClient.getFd(), buf.str());
-      for (UserMapIterator kvIt = pairIterators.first;
-            kvIt != pairIterators.second; ++kvIt) {
-        subscribedNick = kvIt->first;
-        if (subscribedNick != newJoinClient.getNick() 
-          && nicks.find(subscribedNick) != nicks.end()) {
-          int fd = nicks[subscribedNick];
-          if (clients.find(fd) != clients.end()) {
-            IRCClient mClient = clients[fd];
-            buf.clear(); // :japo!~javier@lenovo-i5 JOIN :#tst
-            buf << ':' << mClient.getNick() << '!' << mClient.getUsername()
-              << '@' << mClient.getHost() << " JOIN :" 
-              << channelName << "\r\n";
-              queue_and_send(newJoinClient.getFd(), buf.str());
-          }
-        }
-        subscribedUserMode = kvIt->second;
-        buf.clear();
-        //:ngircd.none.net 353 n02 = #test :n02 @n01    #  RPL_NAMREPLY
-        buf << ':' << server_name << " 353 " << newJoinClient.getNick()
-          << " = " << channelName << ':';
-        if (subscribedUserMode == CHANNEL_OPERATOR) buf << '@';
-        buf << subscribedNick << "\r\n";
-        queue_and_send(newJoinClient.getFd(), buf.str());
-      }        
-      buf.clear();
-      //:ngircd.none.net 366 n02 #test :End of NAMES list # RPL_ENDOFNAMES
-      buf << server_name << " 366 " << newJoinClient.getNick()
-        << ' ' << channelName << " :End of NAMES list\r\n";
-      queue_and_send(newJoinClient.getFd(), buf.str());
-      break;
+    // 1. Confirmar al propio cliente que ha entrado
+    buf.clear();
+    buf << ':' << newJoinClient.getNick() << '!' << newJoinClient.getUsername()
+        << '@' << newJoinClient.getHost() << " JOIN :" << channelName << "\r\n";
+    queue_and_send(newJoinClient.getFd(), buf.str());
+
+    // 2. Notificar a TODOS los demás usuarios del canal que este cliente ha entrado
+    // (Aquí deberías iterar sobre los otros usuarios y enviarles el JOIN del nuevo)
+
+    // 3. Enviar el Topic (332) - CORREGIDO
+    buf.clear();
+    buf << ':' << server_name << " 332 " << newJoinClient.getNick()
+        << " " << channelName << " :" << ircChannel.getTopic() << "\r\n"; // Añadido channelName
+    queue_and_send(newJoinClient.getFd(), buf.str());
+
+    // 4. Enviar lista de nombres (353) - CORREGIDO
+    buf.clear();
+    buf << ':' << server_name << " 353 " << newJoinClient.getNick() << " = " << channelName << " :"; // Espacio antes de ':'
+    
+    for (UserMapIterator kvIt = pairIterators.first; kvIt != pairIterators.second; ++kvIt) {
+        if (kvIt != pairIterators.first) buf << " "; // Espacio entre nicks
+        if (kvIt->second == CHANNEL_OPERATOR) buf << '@';
+        buf << kvIt->first;
+    }
+    buf << "\r\n";
+    queue_and_send(newJoinClient.getFd(), buf.str());
+
+    // 5. Fin de lista de nombres (366) - CORREGIDO
+    buf.clear();
+    buf << ':' << server_name << " 366 " << newJoinClient.getNick()
+        << " " << channelName << " :End of /NAMES list\r\n"; // Añadido ':' inicial
+    queue_and_send(newJoinClient.getFd(), buf.str());
+    break;
     case INVITE_ONLY:
       // :ngircd.none.net 473 japo #test :Cannot join channel (+i) -- Invited users only
       buf.clear();
