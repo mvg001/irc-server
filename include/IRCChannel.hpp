@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCChannel.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mvassall <mvassall@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:10:45 by user1             #+#    #+#             */
-/*   Updated: 2026/02/10 16:05:37 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/11 12:02:31 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define IRCCHANNEL_HPP
 #include "IRCMessage.hpp"
 #include <cstddef>
+#include <ctime>
 #include <string>
 #include <set>
 #include <map>
@@ -195,13 +196,17 @@ const static unsigned MAX_NAME_LENGTH = 50;
   /** @returns invited nicks set */
   const set<string>& getInvitedNicks() const;
 
+  /** @returns {time_t} creation time stamp */
+  size_t getCreationTime() const;
+  
 private:
-  string name;     // channel name
-	map<string, UserMode> nicks; // nick => UserMode
-  string key;                       // password to join the channel
+  string name;            // channel name
+	map<string, UserMode> nicks;    // nick => UserMode
+  string key;                     // password to join the channel
   set<ChannelMode> channelModes;
-  size_t userLimit;                 // max number of clients
-  string topic;                     // current channel topic
-  set<string> invitedNicks;         // nicks invited
+  size_t userLimit;               // max number of clients
+  string topic;                   // current channel topic
+  set<string> invitedNicks;       // nicks invited
+  std::time_t creationTime;       // creation timestamp epoch
 };
 #endif
