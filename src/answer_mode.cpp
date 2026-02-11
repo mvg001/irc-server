@@ -34,7 +34,7 @@ void IRCServ::answer_mode(IRCMessage & msg, int fd) {
 			std::string nick = clients[fd].getNick();
 			std::string server = this->getServerName();
 
-			string modes = "+";
+			string modes = "";
 			const set<ChannelMode>& modesSet = channel.getChannelModes();
 
 			for (set<ChannelMode>::const_iterator it = modesSet.begin(); it != modesSet.end(); ++it)
@@ -45,13 +45,9 @@ void IRCServ::answer_mode(IRCMessage & msg, int fd) {
 
 			queue_and_send(fd, rpl324.str());
 
-			// --- Respuesta 329: Fecha de creación del canal ---
-			// Formato: :<server> 329 <nick> <target> <timestamp>
-			// Ejemplo: :localhost 329 marcog #test 1676112000
-
 			std::stringstream rpl329;
 			rpl329 << ":" << server << " 329 " << nick << " " << target << " " 
-						<< channel.getCreationTime() << "\r\n"; // Timestamp en segundos (long)
+						<< channel.getCreationTime() << "\r\n";
 
 			queue_and_send(fd, rpl329.str());
 

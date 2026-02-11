@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/10 17:25:16 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/11 12:39:23 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -387,8 +387,9 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         case CMD_JOIN:     answer_join(msg, fd);     break;
         case CMD_PART:     answer_part(msg, fd);     break;
         case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
-        case CMD_TOPIC:    answer_topic(msg, fd);  break;
-        case CMD_NAMES:    answer_names(msg, fd);  break;
+        case CMD_TOPIC:    answer_topic(msg, fd);    break;
+        case CMD_NAMES:    answer_names(msg, fd);    break;
+        case CMD_WHO:      answer_who(msg, fd);      break;
         // case CMD_NOTICE:   answer_notice(msg, fd);   break;
         case CMD_PING:     answer_ping(msg, fd);     break;
         case CMD_PONG:     answer_pong(msg, fd);     break;

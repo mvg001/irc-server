@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 12:42:05 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/11 11:22:47 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/11 14:44:39 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,19 +105,22 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
       continue;
     }
     string key = (i < channelKeys.size()) ? channelKeys[i] : "";
-    IRCChannel ircChannel;
-    if (channels.find(channelName) != channels.end()) {
-      ircChannel = channels[channelName];
-    } else {
-      ircChannel.setName(channelName);
-      channels[channelName] = ircChannel;
-      newJoinClient.addChannel(channelName);
-    }
+
+		IRCChannel* ircChannel = NULL;
+
+		std::map<std::string, IRCChannel>::iterator it = channels.find(channelName);
+		if (it != channels.end()) {
+				ircChannel = &(it->second); 
+		} else {
+				channels[channelName] = IRCChannel(channelName);
+				ircChannel = &channels[channelName];
+				newJoinClient.addChannel(channelName);
+		}
     std::ostringstream buf;
     string subscribedNick;
     // UserMode subscribedUserMode;
-    PairUserMapIterators pairIterators = ircChannel.getUsersIterators();
-    switch (ircChannel.addUser(newJoinClient.getNick(),USER_ONLY,key)) {
+    PairUserMapIterators pairIterators = ircChannel->getUsersIterators();
+    switch (ircChannel->addUser(newJoinClient.getNick(),USER_ONLY,key)) {
     case ADD_USER_OK:
     // 1. Confirmar al propio cliente que ha entrado
     buf.clear();
@@ -131,7 +134,7 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
     // 3. Enviar el Topic (332) - CORREGIDO
     buf.clear();
     buf << ':' << server_name << " 332 " << newJoinClient.getNick()
-        << " " << channelName << " :" << ircChannel.getTopic() << "\r\n"; // Añadido channelName
+        << " " << channelName << " :" << ircChannel->getTopic() << "\r\n"; // Añadido channelName
     queue_and_send(newJoinClient.getFd(), buf.str());
 
     // 4. Enviar lista de nombres (353) - CORREGIDO

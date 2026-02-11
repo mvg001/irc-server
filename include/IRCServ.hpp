@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/10 19:57:08 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/11 15:48:06 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ public:
 	void			accept_new_connection();
 	bool			read_from_client(IRCClient & client);
 	void			answer_command(IRCMessage & msg, int fd);
+	void			sendWelcome(int fd);
 	void			queue_and_send(int fd, std::string data);
 	void			broadcast(int fd, std::string notify_msg);
 	void			broadcastToChannel(IRCChannel & channel, const std::string & message);
@@ -77,6 +78,7 @@ public:
 	void			answer_mode(IRCMessage & msg, int fd);
 	void			answer_topic(IRCMessage & msg, int fd);
 	void			answer_names(IRCMessage & msg, int fd);
+	void			answer_who(IRCMessage & msg, int fd);
 	//timeout checkout
 	void			send_ping_to_client(int fd);
 	void			check_clients_timeout(void);
