@@ -64,6 +64,9 @@ public:
   /** Getter for const iterators (begin, end) of the set of joined channels*/
   pairIterators getChannelIterators() const;
 
+  /** @returns a reference to the set of subscribed channel names */
+  const std::set<std::string>& getChannelNames() const;
+
   /** Verifies whether a flag is set for this client*/
   bool checkFlag(const FtIRCFlag& f) const;
   bool setFlag(const FtIRCFlag& f);
@@ -93,7 +96,6 @@ public:
   void    updateLastActivity(void);
   bool    get_server_ping_sent(void);
   void    set_server_ping_sent(void);
-
 
 private:
   int fd;
