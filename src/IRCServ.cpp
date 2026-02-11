@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/10 16:07:51 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/11 16:03:14 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -371,6 +371,7 @@ const std::map<const string, IRCChannel>& IRCServ::getChannels(void) const{
 
 void IRCServ::answer_command(IRCMessage &msg, int fd)
 {
+		std::string rpl = ":" + getServerName() + " CAP * LS :\r\n";
     switch (msg.getCommand())
     {
         // === OBLIGATORIOS por subject ===
@@ -387,9 +388,13 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         case CMD_JOIN:     answer_join(msg, fd);     break;
         case CMD_PART:     answer_part(msg, fd);     break;
         case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
+        case CMD_TOPIC:    answer_topic(msg, fd);    break;
+        case CMD_NAMES:    answer_names(msg, fd);    break;
+        case CMD_WHO:      answer_who(msg, fd);      break;
         // case CMD_NOTICE:   answer_notice(msg, fd);   break;
         case CMD_PING:     answer_ping(msg, fd);     break;
         case CMD_PONG:     answer_pong(msg, fd);     break;
+				case CMD_CAP:       queue_and_send(fd, rpl); break;
 
         default:
             // (???) Enviar error ERR_UNKNOWNCOMMAND (421) al cliente

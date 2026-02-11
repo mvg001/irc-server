@@ -3,10 +3,11 @@
 /*                                                        :::      ::::::::   */
 /*   IRCChannel.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:12:14 by user1             #+#    #+#             */
 /*   Updated: 2026/02/11 15:22:03 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/11 12:29:10 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,6 +256,10 @@ const string& channelModeToString(ChannelMode chMode) {
     m[TOPIC] = "t";
     m[KEY] = "k";
     m[USER_LIMIT] = "l";
+    m[INVITE_ONLY] = "i";
+    m[TOPIC] = "t";
+    m[KEY] = "k";
+    m[USER_LIMIT] = "l";
   }
   return m[chMode];
 }
@@ -297,6 +302,7 @@ const set<string>& IRCChannel::getInvitedNicks() const {
   return invitedNicks;
 }
 
+
 size_t IRCChannel::getCreationTime() const {
   return creationTime;
 }
@@ -308,3 +314,4 @@ const string& IRCChannel::getCreatorNick() const {
 void IRCChannel::setCreatorNick(const string& nick) {
   creatorNick = nick;
 }
+

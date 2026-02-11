@@ -6,6 +6,7 @@
 /*   By: mvassall <mvassall@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2026/02/11 11:03:04 by marcoga2         ###   ########.fr       */
 /*   Updated: 2026/02/11 15:22:29 by mvassall         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -109,7 +110,8 @@ bool IRCClient::isValidUsername(const std::string &username) {
 
 const std::string& IRCClient::getFullname() const { return fullname; }
 bool IRCClient::setFullname(const std::string& fullname) {
-  if (!isValidFullname(fullname)) return false;
+  if (!isValidFullname(fullname))
+		return false;
   this->fullname = fullname;
   return true;
 }
@@ -300,3 +302,4 @@ void    IRCClient::set_server_ping_sent(void){
 const std::set<std::string>& IRCClient::getChannelNames() const {
   return channelNames;
 }
+
