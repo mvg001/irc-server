@@ -17,6 +17,7 @@
 #include "IRCChannel.hpp"
 #include "utils.hpp"
 #include <cstdio>
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -74,36 +75,57 @@ join #test
 */
 
 // :n02!~user2@lenovo-i5 JOIN :#test
-static std::ostringstream& genJoinReply(std::ostringstream& buf, const IRCClient& ircClient, const string& channelName) {
-  buf.clear();
+static string genJoinReply(const IRCClient& ircClient, const string& channelName) {
+  std::ostringstream buf;
   buf << ':' << ircClient.getNick() 
   << '!' << ircClient.getUsername()
   << '@' << ircClient.getHost()
   << " JOIN :" << channelName << "\r\n";
-  return buf;
+  return buf.str();
 }
 
 // :ngircd.none.net 332 n02 #test :Channel usage # RPL_TOPIC
-static std::ostringstream& genTopicReply(std::ostringstream& buf, const string& serverName, const string& nick, const IRCChannel& ircChannel) {
-  buf.clear();
+static string genTopicReply(const string& serverName, const string& nick, const IRCChannel& ircChannel) {
+  std::ostringstream buf; 
   buf << ':' << serverName
     << " 332 " << nick
     << ' ' << ircChannel.getName()
     << " :" << (ircChannel.getTopic().empty()? "Topic not set" : ircChannel.getTopic())
     << "\r\n";
-  return buf;
+  return buf.str();
 }
 
 // :ngircd.none.net 333 n02 #test n01 1770644364 # Undef in RFC2812
-static std::ostringstream& genCreationTimeReply(std::ostringstream& buf, const string& serverName, const string& nick, const IRCChannel& ircChannel) {
-  buf.clear();
+static string genCreationTimeReply(const string& serverName, const string& nick, const IRCChannel& ircChannel) {
+  std::ostringstream buf; 
   buf << ':' << serverName
     << " 333 " << nick
     << ' ' << ircChannel.getName()
     << ' ' << ircChannel.getCreatorNick()
     << ' ' << ircChannel.getCreationTime()
     << "\r\n";
-  return buf;
+  return buf.str();
+}
+
+//:ngircd.none.net 353 n003 = #test :n003 n002 @n001
+static string genMemberReply(const string& server_name, const string& jNick, 
+  const string& channelName, const UserMode mUserMode, const string& mNick) {
+  std::ostringstream buf;
+  buf << ':' << server_name 
+    << " 353 " << jNick
+    << " = " << channelName << " :";
+  if (mUserMode == CHANNEL_OPERATOR) buf << '@';
+  buf << mNick << "\r\n";
+  return buf.str();
+}
+
+// :ngircd.none.net 366 n003 #test :End of NAMES list
+static string genEndList(const string& server_name, const string& jNick,
+  const string& channelName) {
+  std::ostringstream buf;
+  buf << server_name << " 366 " << jNick << ' ' << channelName 
+    << " :End of NAMES list\r\n";
+  return buf.str();
 }
 
 void  IRCServ::answer_join(IRCMessage& msg, int fd) {
@@ -111,6 +133,7 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
     return;
   IRCClient& jClient = clients[fd];   // IRCClient of the JOIN issuer
   size_t nParams = msg.getParametersSize();
+  std::cerr << "answer_join-1: nParams=" << nParams << std::endl;
   if (nParams == 0 || nParams > 2) { // Syntax error
     queue_and_send(fd,
       genSyntaxError(server_name, jClient.getNick(),"JOIN"));
@@ -122,6 +145,8 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
   }
   // a list of channels
   vector<string> channelNames = split(msg.getParam(0), ",");
+  std::cerr << "answer_join-2: channelNames.size=" << channelNames.size() << std::endl;
+
   if (channelNames.empty()) {
     queue_and_send(fd,
     genSyntaxError(server_name, jClient.getNick(),"JOIN"));
@@ -147,18 +172,18 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
       ircChannel.setCreatorNick(jClient.getNick());
       jClient.addChannel(channelName);
     }
-    genJoinReply(buf, jClient, channelName);
-    string joinRequest = buf.str();
+    string joinRequest = genJoinReply(jClient, channelName);
     ChannelMode result = ircChannel.addUser(jClient.getNick(),USER_ONLY,key);
     if (result == ADD_USER_OK) {
       channels[channelName] = ircChannel;
       // :n01!~user1@lenovo-i5 JOIN :#test
       queue_and_send(jClient.getFd(), joinRequest); // ack join command
       // :ngircd.none.net 332 n02 #test :Channel usage # RPL_TOPIC
-      genTopicReply(buf, server_name, jClient.getNick(), ircChannel);
-      queue_and_send(jClient.getFd(), buf.str());
+      string topic = genTopicReply(server_name, jClient.getNick(), ircChannel);
+      queue_and_send(jClient.getFd(), topic);
       // :ngircd.none.net 333 n02 #test n01 1770644364 # Undef in RFC2812
-      genCreationTimeReply(buf, server_name, jClient.getNick(), ircChannel);
+      string timestamp = genCreationTimeReply(server_name, jClient.getNick(), ircChannel);
+      queue_and_send(jClient.getFd(), timestamp);
       PairUserMapIterators pIts = ircChannel.getUsersIterators();
       for (UserMapIterator kvIt = pIts.first; kvIt != pIts.second; ++kvIt) { // scan all members of the channel
         string mNick = kvIt->first;
@@ -170,19 +195,13 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
         }
         // send members of the channel to the requestor
         UserMode mUserMode = kvIt->second; // member user mode
-        buf.clear();
         //:ngircd.none.net 353 n003 = #test :n003 n002 @n001
-        buf << ':' << server_name << " 353 " << jClient.getNick()
-          << " = " << channelName << " :";
-        if (mUserMode == CHANNEL_OPERATOR) buf << '@';
-        buf << mNick << "\r\n";
-        queue_and_send(jClient.getFd(), buf.str());
+        string member = genMemberReply(server_name, jClient.getNick(), channelName, mUserMode, mNick);
+        queue_and_send(jClient.getFd(), member);
       } // scan all members of the channel
-      buf.clear();
       // :ngircd.none.net 366 n003 #test :End of NAMES list
-      buf << server_name << " 366 " << jClient.getNick()
-        << ' ' << channelName << " :End of NAMES list\r\n";
-      queue_and_send(jClient.getFd(), buf.str());
+      string endList = genEndList(server_name, jClient.getNick(), channelName);
+      queue_and_send(jClient.getFd(), endList);
     } else if (result == INVITE_ONLY) {
       // :ngircd.none.net 473 japo #test :Cannot join channel (+i) -- Invited users only
       buf.clear();
