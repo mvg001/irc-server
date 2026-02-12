@@ -90,8 +90,14 @@ private:
 	int epoll_fd;
 	std::map<int, IRCClient> clients;					// fd -> IRCClient
 	struct epoll_event events[16];
+
+	// nick -> fd
+	// nicknames are case-insensitive
 	std::map<const std::string, int> nicks;		// nick -> fd
-	std::map<const string, IRCChannel> channels;
+
+	// channelName -> IRCChannel
+	// IRC channel names are case-insensitive
+	std::map<const string, IRCChannel> channels; 
 	string server_name;
 };
 #endif

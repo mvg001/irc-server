@@ -29,7 +29,9 @@ IRCChannel::IRCChannel(const string& name, const string& creatorNick) {
   ft_toLower(this->name);
   userLimit = 0;
   creationTime = std::time(NULL);
-  this->creatorNick = creatorNick;
+  string lcCreatorNick = creatorNick;
+  ft_toLower(lcCreatorNick);
+  this->creatorNick = lcCreatorNick;
 }
 
 IRCChannel::IRCChannel(const IRCChannel& other):
@@ -111,16 +113,20 @@ bool IRCChannel::setName(const std::string& name) {
 }
 
 bool IRCChannel::checkUser(const string& nick) const {
-  return nicks.find(nick) != nicks.end();
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  return nicks.find(lcNick) != nicks.end();
 }
 
 ChannelMode IRCChannel::addUser(
   const string& nick, 
   UserMode userMode, 
   const string& userKey) {
-  if (checkUser(nick)) return ADD_USER_OK;
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  if (checkUser(lcNick)) return ADD_USER_OK;
   if (nicks.empty()) {
-    nicks[nick] = CHANNEL_OPERATOR;
+    nicks[lcNick] = CHANNEL_OPERATOR;
     return ADD_USER_OK;
   }
   if (checkChannelMode(USER_LIMIT) && nicks.size() >= userLimit)
@@ -131,12 +137,14 @@ ChannelMode IRCChannel::addUser(
   if (checkChannelMode(KEY) && (userKey != key)) {
     return KEY;
   }
-  nicks[nick] = userMode;
+  nicks[lcNick] = userMode;
   return ADD_USER_OK;
 }
 
 bool IRCChannel::delUser(const string& nick) {
-  return nicks.erase(nick) != 0;
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  return nicks.erase(lcNick) != 0;
 }
 
 void IRCChannel::clearUsers() {
@@ -144,17 +152,18 @@ void IRCChannel::clearUsers() {
 }
 
 bool IRCChannel::setUserMode(const string& nick, UserMode userMode) {
-  if (nicks.count(nick) == 0) return false;
-  nicks[nick] = userMode;
+  if (!checkUser(nick)) return false;
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  nicks[lcNick] = userMode;
   return true;
 }
 
 UserMode IRCChannel::getUserMode(const string& nick) const {
-  if (!checkUser(nick)) return UNDEF;
-	map<string, UserMode>::const_iterator it = nicks.find(nick);
-	if (it == nicks.end()) {
-		throw std::runtime_error("NO SUCH NICK");
-  }
+  string lcNick = nick;
+  ft_toLower(lcNick);
+	map<string, UserMode>::const_iterator it = nicks.find(lcNick);
+	if (it == nicks.end()) return UNDEF;
   return it->second;
 }
 
@@ -194,8 +203,10 @@ const string& IRCChannel::getTopic() const {
 }
 
 bool IRCChannel::setTopic(const string& nick, const string& newTopic) {
-  if ((channelModes.count(TOPIC) == 0)
-    || (nicks.count(nick) != 0 && nicks[nick] == CHANNEL_OPERATOR)) {
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  if ((!checkChannelMode(TOPIC))
+    || (checkUser(lcNick) && nicks[lcNick] == CHANNEL_OPERATOR)) {
     topic = newTopic;
     return true;
   }
@@ -275,15 +286,21 @@ const string& userModeToString(UserMode uMode) {
 }
 
 bool IRCChannel::addInvitedNick(const string& nick) {
-  return invitedNicks.insert(nick).second;
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  return invitedNicks.insert(lcNick).second;
 }
 
 bool IRCChannel::checkInvitedNick(const string& nick) const {
-  return invitedNicks.find(nick) != invitedNicks.end();
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  return invitedNicks.find(lcNick) != invitedNicks.end();
 }
 
 bool IRCChannel::delInvitedNick(const string& nick) {
-  return invitedNicks.erase(nick) > 0;
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  return invitedNicks.erase(lcNick) > 0;
 }
 
 void IRCChannel::delAllInvitedNicks() {
@@ -312,6 +329,8 @@ const string& IRCChannel::getCreatorNick() const {
 }
 
 void IRCChannel::setCreatorNick(const string& nick) {
-  creatorNick = nick;
+  string lcNick = nick;
+  ft_toLower(lcNick);
+  creatorNick = lcNick;
 }
 

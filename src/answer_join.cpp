@@ -154,7 +154,7 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
   if (nParams == 2) channelKeys = split(msg.getParam(1),",");
   for (size_t i=0; i < channelNames.size(); ++i) { // iterate over all requested channels
     string channelName = channelNames[i];
-    ft_toLower(channelName);
+    ft_toLower(channelName); // IRC channel names are case-insensitive
     if (!IRCChannel::isValidName(channelName)) {
       string rp = genNoSuchChannel(server_name, jClient.getNick(), channelName);
       queue_and_send(fd, rp);
