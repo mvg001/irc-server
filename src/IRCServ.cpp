@@ -14,6 +14,7 @@
 
 
 #include "IRCServ.hpp"
+#include "utils.hpp"
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
@@ -368,6 +369,14 @@ const std::map<const string, IRCChannel>& IRCServ::getChannels(void) const{
 	return (channels);
 }
 
+/** Deletes an empty channel (number of users == 0) */
+void			IRCServ::delEmptyChannel(const string channelName) {
+	string lcChannelName = channelName;
+	ft_toLower(lcChannelName);
+	if (channels.find(lcChannelName) == channels.end()) return;
+	if (channels[lcChannelName].getNumberOfUsers() != 0) return;
+	channels.erase(lcChannelName);
+}
 
 void IRCServ::answer_command(IRCMessage &msg, int fd)
 {

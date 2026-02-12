@@ -12,6 +12,7 @@
 /* ************************************************************************** */
 
 #include "IRCChannel.hpp"
+#include "IRCServ.hpp"
 #include "utils.hpp"
 #include <cstddef>
 #include <sstream>
@@ -332,5 +333,28 @@ void IRCChannel::setCreatorNick(const string& nick) {
   string lcNick = nick;
   ft_toLower(lcNick);
   creatorNick = lcNick;
+}
+
+void partChannel(IRCServ& ircServer, IRCClient& client, IRCChannel& channel, const string& byeMsg) {
+  std::ostringstream buf;
+  buf << ':' << client.getNick() << '!' << client.getUsername() << '@' << client.getHost()
+    << " PART " << channel.getName() << " :"
+    << (byeMsg.empty() ? "client leaving" : byeMsg) 
+    << "\r\n";
+  const string reply = buf.str();
+  std::map<const std::string, int> allNicks2Fd = ircServer.getNicks();
+  for (map<string, UserMode>::const_iterator it = channel.getNicksMap().begin();
+    it != channel.getNicksMap().end(); ++it) {  // go thru all list members
+    string mNick = it->first;   // member nick
+    if (allNicks2Fd.find(mNick) == allNicks2Fd.end()) continue;
+    int mFD = allNicks2Fd[mNick];
+    if (ircServer.getClients().find(mFD) == ircServer.getClients().end()) continue;
+    ircServer.queue_and_send(mFD, reply);
+  }
+  channel.delUser(client.getNick());
+  client.delChannel(channel.getName());
+  if (channel.getNumberOfUsers() == 0) {
+    ircServer.delEmptyChannel(channel.getName());
+  }
 }
 

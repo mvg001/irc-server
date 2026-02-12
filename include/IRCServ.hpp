@@ -83,6 +83,11 @@ public:
 	void			send_ping_to_client(int fd);
 	void			check_clients_timeout(void);
 
+	/** Deletes an empty channel (number of users == 0) from 
+	channel map channels.
+	*/
+	void			delEmptyChannel(const string channelName);
+
 
 private:
 	int listening_socket;

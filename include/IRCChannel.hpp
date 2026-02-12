@@ -12,6 +12,7 @@
 
 #ifndef IRCCHANNEL_HPP
 #define IRCCHANNEL_HPP
+#include "IRCClient.hpp"
 #include "IRCMessage.hpp"
 #include <cstddef>
 #include <ctime>
@@ -23,6 +24,8 @@ using std::map;
 using std::string;
 using std::set;
 using std::pair;
+
+class IRCServ;
 
 typedef enum {
   ADD_USER_OK,  // Invalid in Mode only used as a return value in addUser
@@ -216,4 +219,7 @@ private:
   std::time_t creationTime;       // creation timestamp epoch
   string creatorNick;
 };
+
+/** Delete a client from a channel notifying all members of its exit */
+void partChannel(IRCServ& ircServer, IRCClient& client, IRCChannel& channel, const string& byeMsg);
 #endif
