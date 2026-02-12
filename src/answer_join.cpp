@@ -16,28 +16,8 @@
 #include "IRCServ.hpp"
 #include "IRCChannel.hpp"
 #include "utils.hpp"
-#include <cstdio>
-#include <iostream>
 #include <sstream>
 #include <string>
-
-
-static void join0(const IRCClient& client, int fd) {
-  (void)client;
-  (void)fd;
-/*   pairIterators clientChIts = client.getChannelIterators();
-  std::ostringstream oss; // append all channel names separated with ','
-  for (setOfStringsIterator chIt = clientChIts.first;
-    chIt != clientChIts.second; ++chIt) {
-    if (chIt != clientChIts.first) oss << ',';
-    oss << *chIt;
-  }
-  vector<string> params;
-  params.push_back(oss.str());
-  IRCMessage msg("", CMD_PART, params);
-  answer_part(msg, fd); */
-  return;   
-}
 
 /*
 join lalala
@@ -131,20 +111,24 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
     return;
   IRCClient& jClient = clients[fd];   // IRCClient of the JOIN issuer
   size_t nParams = msg.getParametersSize();
-  std::cerr << "answer_join-1: nParams=" << nParams << std::endl;
   if (nParams == 0 || nParams > 2) { // Syntax error
     queue_and_send(fd,
       genSyntaxError(server_name, jClient.getNick(),"JOIN"));
     return;
   }
-  if (nParams == 1 && msg.getParam(0) == "0") {
-      join0(jClient, fd);
-      return;
+  if (nParams == 1 && msg.getParam(0) == "0") { // join 0
+    if (jClient.getChannelNames().empty()) return;
+      const std::set<std::string>& channelNames = jClient.getChannelNames();
+      for (std::set<std::string>::const_iterator chNameIt = channelNames.begin();
+        chNameIt != channelNames.end(); ++chNameIt) {
+        if (channels.find(*chNameIt) == channels.end()) continue;
+        IRCChannel ircChannel = channels[*chNameIt];
+        partChannel(*this, jClient, ircChannel, "");
+      }
+    return;
   }
   // a list of channels
   vector<string> channelNames = split(msg.getParam(0), ",");
-  std::cerr << "answer_join-2: channelNames.size=" << channelNames.size() << std::endl;
-
   if (channelNames.empty()) {
     queue_and_send(fd,
     genSyntaxError(server_name, jClient.getNick(),"JOIN"));
