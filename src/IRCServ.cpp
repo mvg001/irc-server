@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/10 17:03:34 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/12 11:06:56 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -381,7 +381,7 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
         case CMD_PASS:     answer_pass(msg, fd);     break;
         case CMD_NICK:     answer_nick(msg, fd);     break;
         case CMD_USER:     answer_user(msg, fd);     break;
-        // case CMD_QUIT:     answer_quit(msg, fd);     break;
+        case CMD_QUIT:     answer_quit(msg, fd);     break;
 
         // // === extras ===
         case CMD_JOIN:     answer_join(msg, fd);     break;

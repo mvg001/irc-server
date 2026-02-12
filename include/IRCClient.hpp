@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:36:20 by user1             #+#    #+#             */
-/*   Updated: 2026/02/10 15:28:49 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/12 16:00:26 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,10 +89,15 @@ public:
 	const std::string & getHost() const;
 	void setHost(const std::string & s);
 
+  //timeout
   time_t  getLastActivity(void) const;
   void    updateLastActivity(void);
   bool    get_server_ping_sent(void);
   void    set_server_ping_sent(void);
+
+  //quit
+  bool    get_toBeEliminated(void) const;
+  void    set_toBeEliminated(bool eliminate);
 
 
 private:
@@ -107,6 +112,7 @@ private:
   std::string Obuffer;
   time_t      last_activity;
   bool        server_ping_sent;
+  bool        _toBeEliminated;
 };
 
 #endif
