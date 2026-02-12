@@ -152,7 +152,6 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
   }
   vector<string> channelKeys;
   if (nParams == 2) channelKeys = split(msg.getParam(1),",");
-  std::ostringstream buf;
   for (size_t i=0; i < channelNames.size(); ++i) { // iterate over all requested channels
     string channelName = channelNames[i];
     ft_toLower(channelName);
@@ -202,19 +201,19 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
       queue_and_send(jClient.getFd(), endList);
     } else if (result == INVITE_ONLY) {
       // :ngircd.none.net 473 japo #test :Cannot join channel (+i) -- Invited users only
-      buf.clear();
+      std::ostringstream buf;
       buf << server_name << " 473 " << jClient.getNick() << ' ' << channelName
         << " :Cannot join channel (+i) -- Invited users only\r\n";
       queue_and_send(jClient.getFd(), buf.str());
     } else if (result == KEY) {
       // :ngircd.none.net 475 japo #test :Cannot join channel (+k) -- Wrong channel key
-      buf.clear();
+      std::ostringstream buf;;
       buf << server_name << " 475 " << jClient.getNick() << ' ' << channelName
         << " :Cannot join channel (+k) -- Wrong channel key\r\n";
       queue_and_send(jClient.getFd(), buf.str()); 
     } else if (result == USER_LIMIT) {
       // :ngircd.none.net 471 japo #test :Cannot join channel (+l) -- Channel is full, try later
-      buf.clear();
+      std::ostringstream buf;;
       buf << server_name << " 471 " << jClient.getNick() << ' ' << channelName
         << " :Cannot join channel (+l) -- Channel is full, try later\r\n";
       queue_and_send(jClient.getFd(), buf.str());         
