@@ -43,14 +43,12 @@ static void join0(const IRCClient& client, int fd) {
 join lalala
 :ngircd.none.net 403 n01 lalala :No such channel
 */
-static std::ostringstream& genNoSuchChannel(std::ostringstream& oss, const string& servername,
+static string genNoSuchChannel(const string& servername,
   const string& nick, const string& channelName) {
-  oss << ':' << servername 
-    << ' ' << IRCCommandtoString(ERR_NOSUCHCHANNEL)
-    << ' ' << nick
-    << ' ' << channelName
+  std::ostringstream oss;
+  oss << ':' << servername << " 403 " << nick << ' ' << channelName
     << " :No such channel\r\n";
-  return oss;
+  return oss.str();
 }
 
 /*
@@ -159,8 +157,8 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
     string channelName = channelNames[i];
     ft_toLower(channelName);
     if (!IRCChannel::isValidName(channelName)) {
-      genNoSuchChannel(buf, server_name, jClient.getNick(), channelName);
-      queue_and_send(fd, buf.str());
+      string rp = genNoSuchChannel(server_name, jClient.getNick(), channelName);
+      queue_and_send(fd, rp);
       continue;
     }
     string key = (i < channelKeys.size()) ? channelKeys[i] : "";
@@ -220,7 +218,6 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
       buf << server_name << " 471 " << jClient.getNick() << ' ' << channelName
         << " :Cannot join channel (+l) -- Channel is full, try later\r\n";
       queue_and_send(jClient.getFd(), buf.str());         
-      break;
     }
   } // iterate over all requested channels
 }
