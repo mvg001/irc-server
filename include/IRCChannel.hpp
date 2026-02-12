@@ -206,7 +206,7 @@ const static unsigned MAX_NAME_LENGTH = 50;
   void setCreatorNick(const string& nick);
   
 private: 
-  string name;            // channel name
+  string name;            // channel name, lower case
 	map<string, UserMode> nicks;    // nick => UserMode
   string key;                     // password to join the channel
   set<ChannelMode> channelModes;
