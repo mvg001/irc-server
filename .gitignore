@@ -57,4 +57,4 @@ dkms.conf
 docs/
 tests/
 ircserv
-launch.json
+.vscode/
