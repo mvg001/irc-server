@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 11:23:19 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 14:54:46 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,9 +169,39 @@ void IRCServ::run()
 				process_client_buffer(fd);
 			}
 		}
+		std::set<int>& to_remove = get_clientsToBeRemoved();
+		std::set<int>::iterator it_fd = to_remove.begin();
+		
+		while (it_fd != to_remove.end())
+		{
+			int fd = *it_fd;
+			std::map<int, IRCClient>::iterator it_client = clients.find(fd);
+			
+			//CASO 1: el cliente YA NO EXISTE en el mapa
+			if (it_client == clients.end()){
+				to_remove.erase(it_fd++); //lo quitamos de SET ya que no existe
+				continue;
+			}
+			
+			//CASO 2: El cliente EXISTE. Lo podemos cerrar?
+			if (it_client->second.getObuffer().empty()){ //si se ha vaciado el buffer...
+				close_client(fd); //llamada segura a eliminarle por que existe.
+				to_remove.erase(it_fd++); //lo quitamos de SET.
+			} else {
+				++it_fd; //aun hay datos en el SET, lo
+			}
+		}		
 	}
 }
  
+
+void printNicks(std::map<const std::string, int> & set)
+{
+    for (std::map<const std::string, int>::const_iterator it = set.begin(); it != set.end(); ++it)
+        std::cout << "Nick: " << it->first << ", Valor: " << it->second << std::endl;
+}
+
+
 void IRCServ::close_client(int fd)
 {
     // 1. Eliminar del epoll
@@ -199,6 +229,7 @@ void IRCServ::close_client(int fd)
         }
         // 4. Limpieza de los mapas globales del servidor
         nicks.erase(nick);
+
         clients.erase(client_it);
     }
     // 5. Cierre físico del socket
@@ -354,7 +385,7 @@ void	IRCServ::check_clients_timeout(void){
 			<< (TIMEOUT + 60) << "seconds\r\n";
 			queue_and_send(fd, msg.str());
 			++it; //note* above
-			close_client(fd); //hay que eliminar el nick y canales en la funcion
+			set_clientsToBeRemoved(fd); //hay que eliminar el nick y canales en la funcion
 		}
 		else
 			++it;

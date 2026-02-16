@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/04 15:34:32 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/11 15:54:48 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 14:26:11 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,13 @@ void IRCServ::answer_pass(IRCMessage & msg, int fd)
 	if (recv_pass.str().empty())
 	{
 		queue_and_send(fd, "461 * PASS :Not enough parameters\r\n");
-		close_client(fd);
+		set_clientsToBeRemoved(fd);
 		return;
 	}
 	if (recv_pass.str() != clientPassword)
 	{
 		queue_and_send(fd, "464 * :Password incorrect\r\n");
-		close_client(fd);
+		set_clientsToBeRemoved(fd);
 		return;
 	}
 	clients[fd].setFlag(PASS_FLAG);

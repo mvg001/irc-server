@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 10:24:54 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 12:10:26 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,14 +101,12 @@ private:
 	std::map<int, IRCClient> clients;					// fd -> IRCClient
 	struct epoll_event events[16];
 
-	// nick -> fd
 	// nicknames are case-insensitive
 	std::map<const std::string, int> nicks;		// nick -> fd
 
-	// channelName -> IRCChannel
 	// IRC channel names are case-insensitive
-	std::map<const string, IRCChannel> channels; 
-		std::set<int>	_clientsToBeRemoved; //FDs 
+	std::map<const string, IRCChannel> channels; // channelName -> IRCChannel
+	std::set<int>	_clientsToBeRemoved; //FDs 
 	string server_name;
 };
 #endif

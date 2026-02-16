@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   answer_quit.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/12 11:09:52 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/13 11:30:34 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/16 14:25:48 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,26 +121,4 @@ void IRCServ::answer_quit(IRCMessage & msg, int fd) {
 	 
 	//mark the user to be eliminated from server in the loop.
 	set_clientsToBeRemoved(fd);
-	/*en el loop deberia ser algo asi como:
-		std::set<int>& to_remove = get_clientsToBeRemoved();
-		std::set<int>::iterator it_fd = to_remove.begin();
-		
-		while (it_fd != to_remove.end()){
-			int fd = *it_fd;
-			std::map<int, IRCClient>::iterator it_client = clients.find(fd);
-			
-			//CASO 1: el cliente YA NO EXISTE en el mapa
-			if (it_client == clients.end()){
-				to_remove.erase(it_fd++); //lo quitamos de SET ya que no existe
-				continue;
-			}
-			
-			//CASO 2: El cliente EXISTE. Lo podemos cerrar?
-			if (it_client->second.getObuffer().empty()){ //si se ha vaciado el buffer...
-				close_client(fd); //llamada segura a eliminarle por que existe.
-				to_remove.erase(it_fd++); //lo quitamos de SET.
-			} else {
-				++it_fd; //aun hay datos en el SET, lo
-			}
-		}		*/
 }
