@@ -3,11 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCClient.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvassall <mvassall@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/11 11:03:04 by marcoga2         ###   ########.fr       */
-/*   Updated: 2026/02/11 15:22:29 by mvassall         ###   ########.fr       */
+/*   Updated: 2026/02/16 10:25:36 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

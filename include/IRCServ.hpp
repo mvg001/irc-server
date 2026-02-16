@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/11 15:48:06 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 10:24:54 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,26 +65,32 @@ public:
     void broadcastToChannel(IRCChannel& channel, const std::string& message);
     void send_names_from_channel(const IRCChannel& channel, int fd);
 
-    void answer_pass(IRCMessage& msg, int fd);
-    void answer_nick(IRCMessage& msg, int fd);
-    void answer_user(IRCMessage& msg, int fd);
-    void answer_ping(IRCMessage& msg, int fd);
-    void answer_join(IRCMessage& msg, int fd);
-    void answer_part(IRCMessage& msg, int fd);
-    void answer_pong(IRCMessage& msg, int fd);
-    void answer_privmsg(IRCMessage& msg, int fd);
-    void answer_mode(IRCMessage& msg, int fd);
-    void answer_topic(IRCMessage& msg, int fd);
-    void answer_names(IRCMessage& msg, int fd);
-    void answer_who(IRCMessage& msg, int fd);
-    // timeout checkout
-    void send_ping_to_client(int fd);
-    void check_clients_timeout(void);
+	void			answer_pass(IRCMessage & msg, int fd);
+	void			answer_nick(IRCMessage & msg, int fd);
+	void			answer_user(IRCMessage & msg, int fd);
+	void			answer_ping(IRCMessage & msg, int fd);
+	void 			answer_join(IRCMessage & msg, int fd);
+	void 			answer_part(IRCMessage & msg, int fd);	
+	void			answer_pong(IRCMessage & msg, int fd);
+	void			answer_privmsg(IRCMessage & msg, int fd);
+	void			answer_mode(IRCMessage & msg, int fd);
+		void			answer_notice(IRCMessage & msg, int fd);
+		void			answer_quit(IRCMessage & msg, int fd);
+	void			answer_topic(IRCMessage & msg, int fd);
+	void			answer_names(IRCMessage & msg, int fd);
+	void			answer_who(IRCMessage & msg, int fd);
+	//timeout checkout
+	void			send_ping_to_client(int fd);
+	void			check_clients_timeout(void);
 
-    /** Deletes an empty channel (number of users == 0) from
-    channel map channels.
-    */
-    void delEmptyChannel(const string channelName);
+		//QUIT or any other function to remove clients in the loop
+		std::set<int>& get_clientsToBeRemoved(void);
+		void					set_clientsToBeRemoved(int fd);
+			/** Deletes an empty channel (number of users == 0) from 
+	channel map channels.
+	*/
+	void			delEmptyChannel(const string channelName);
+
 
 private:
     int listening_socket;
@@ -97,9 +103,10 @@ private:
     // nicknames are case-insensitive
     std::map<const std::string, int> nicks; // nick -> fd
 
-    // channelName -> IRCChannel
-    // IRC channel names are case-insensitive
-    std::map<const string, IRCChannel> channels;
-    string server_name;
+	// channelName -> IRCChannel
+	// IRC channel names are case-insensitive
+	std::map<const string, IRCChannel> channels; 
+		std::set<int>	_clientsToBeRemoved; //FDs 
+	string server_name;
 };
 #endif

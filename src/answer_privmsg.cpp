@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   answer_prvmsg.cpp                                  :+:      :+:    :+:   */
+/*   answer_privmsg.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 17:20:21 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/10 14:46:04 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/10 17:16:04 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,20 @@
 #include "utils.hpp"
 #include <sstream>
 
-void to_user(std::vector<std::string>& msg, int fd, std::string& target, IRCServ& server)
-{
-    const std::map<int, IRCClient>& clients = server.getClients(); // have all the clients
-    const std::map<const std::string, int>& nicks = server.getNicks();
-    std::ostringstream reply;
-
-    // 1. search if there is an fd for the Nick passed (target).
-    std::map<const std::string, int>::const_iterator it_target = nicks.find(target);
-
-    // 2. search for the creator of the msg to obtain his nick/user/host for the prefix.
-    std::map<int, IRCClient>::const_iterator it_sender = clients.find(fd);
-    if (it_sender == clients.end())
-        return;
-    const IRCClient& sender = it_sender->second;
+static void	to_user(std::vector<std::string>& msg, int fd, std::string & target, IRCServ& server){
+	const std::map<int, IRCClient>&						clients	= server.getClients(); //have all the clients
+	const std::map<const std::string, int>&		nicks		= server.getNicks();
+	std::ostringstream												reply;
+	
+	
+	//1. search if there is an fd for the Nick passed (target).
+	std::map<const std::string, int>::const_iterator it_target = nicks.find(target);
+	
+	//2. search for the creator of the msg to obtain his nick/user/host for the prefix.
+	std::map<int, IRCClient>::const_iterator it_sender = clients.find(fd);
+  if (it_sender == clients.end())
+    return;    
+  const IRCClient &sender = it_sender->second;
 
     // 3. construct the reply msg format: :nick!user@host PRIVMSG target :message.
     if (it_target != nicks.end()) {
@@ -63,21 +63,20 @@ void to_user(std::vector<std::string>& msg, int fd, std::string& target, IRCServ
     }
 }
 
-void to_channel(std::vector<std::string>& msg, int fd, std::string& target, IRCServ& server)
-{
-    // target = target.substr(1); //I need the prefix because #myChannel is different than !myChannel.
-
-    // obtain the channels objects from server.
-    const std::map<const std::string, IRCChannel>& channels = server.getChannels();
-    std::ostringstream reply;
-
-    // catch sender to have data from him.
-    const std::map<int, IRCClient>& clients = server.getClients(); // have all the clients
-    std::map<int, IRCClient>::const_iterator it_sender = clients.find(fd);
-    if (it_sender == clients.end())
-        return;
-    const IRCClient& sender = it_sender->second;
-    std::string sender_nick = sender.getNick();
+static void	to_channel(std::vector<std::string>& msg, int fd, std::string & target, IRCServ& server){
+	//target = target.substr(1); //I need the prefix because #myChannel is different than !myChannel.
+	
+	//obtain the channels objects from server.
+	const std::map<const std::string, IRCChannel>&	channels = server.getChannels();
+	std::ostringstream	reply;
+	
+	//catch sender to have data from him.
+	const std::map<int, IRCClient>&	clients	= server.getClients(); //have all the clients
+	std::map<int, IRCClient>::const_iterator it_sender = clients.find(fd);
+  if (it_sender == clients.end())
+    return;    
+  const IRCClient &sender = it_sender->second;
+	std::string sender_nick = sender.getNick();
 
     // 1. Search for the channel.
     std::map<const string, IRCChannel>::const_iterator it_chan = channels.find(target);
