@@ -382,17 +382,6 @@ void					IRCServ::set_clientsToBeRemoved(int fd){
 }
 
 
-//quit
-std::set<int>& IRCServ::get_clientsToBeRemoved(void){
-	return (_clientsToBeRemoved);
-}
-
-//quit
-void					IRCServ::set_clientsToBeRemoved(int fd){
-	_clientsToBeRemoved.insert(fd);
-}
-
-
 /** Deletes an empty channel (number of users == 0) */
 void IRCServ::delEmptyChannel(const string channelName)
 {
