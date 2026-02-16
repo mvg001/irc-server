@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 10:29:31 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 11:23:19 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,10 @@ void IRCServ::run()
 				if (events[i].events & EPOLLOUT)
 					this->queue_and_send(fd, ""); 
 				if (read_from_client(clients[fd]))
+				{
 					close_client(fd);
+					continue ;
+				}
 				process_client_buffer(fd);
 			}
 		}
@@ -270,8 +273,7 @@ bool IRCServ::read_from_client(IRCClient & client)
 			else if (errno == EINTR)
 				continue;
 			else
-				throw std::runtime_error(std::string("recv(): ")
-				+ strerror(errno));
+				return false;
 		}
 	}
 }
@@ -378,18 +380,6 @@ std::set<int>& IRCServ::get_clientsToBeRemoved(void){
 void					IRCServ::set_clientsToBeRemoved(int fd){
 	_clientsToBeRemoved.insert(fd);
 }
-
-
-//quit
-std::set<int>& IRCServ::get_clientsToBeRemoved(void){
-	return (_clientsToBeRemoved);
-}
-
-//quit
-void					IRCServ::set_clientsToBeRemoved(int fd){
-	_clientsToBeRemoved.insert(fd);
-}
-
 
 /** Deletes an empty channel (number of users == 0) */
 void			IRCServ::delEmptyChannel(const string channelName) {
