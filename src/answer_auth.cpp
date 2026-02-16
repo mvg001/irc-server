@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/04 15:34:32 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/16 17:22:08 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 17:35:36 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <sstream>
 #include <iostream>
 #include <cerrno>
+#include <ctime>
 
 
 void IRCServ::answer_pass(IRCMessage & msg, int fd)
@@ -180,7 +181,9 @@ void IRCServ::sendWelcome(int fd)
     std::string rpl002 = ":" + sName + " 002 " + nick + " :Your host is " + sName + ", running version 1.0\r\n";
     queue_and_send(fd, rpl002);
 
-    std::string rpl003 = ":" + sName + " 003 " + nick + " :This server was created Wed Feb 11 2026\r\n";
+		time_t t = time(0);
+		char b[32];
+		std::string rpl003 = ":" + sName + " 003 " + nick + " :You joined this server at " + (strftime(b, 32, "%a %b %d %Y", localtime(&t)), b) + "\r\n";
     queue_and_send(fd, rpl003);
 
     std::string rpl004 = ":" + sName + " 004 " + nick + " " + sName + " 1.0 i ntklo\r\n";
