@@ -12,6 +12,7 @@
 
 #include "IRCCommand.hpp"
 #include "IRCServ.hpp"
+#include "utils.hpp"
 #include <sstream>
 
 void to_user(std::vector<std::string>& msg, int fd, std::string& target, IRCServ& server)
@@ -155,6 +156,7 @@ void IRCServ::answer_privmsg(IRCMessage& msg, int fd)
     if (clients.count(fd)) {
 
         std::string target = msg.getParam(0);
+        ft_toLower(target);
         std::vector<std::string> parameters = msg.getParamsVector();
         if (!target.empty() && (target[0] == '#' || target[0] == '&' || target[0] == '+' || target[0] == '!'))
             to_channel(parameters, fd, target, *this);

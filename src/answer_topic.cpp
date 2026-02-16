@@ -1,11 +1,8 @@
 #include "IRCChannel.hpp"
-#include "IRCClient.hpp"
-#include "IRCCommand.hpp"
 #include "IRCMessage.hpp"
 #include "IRCServ.hpp"
-#include <sstream>
+#include "utils.hpp"
 #include <string>
-#include <vector>
 
 void IRCServ::answer_topic(IRCMessage& msg, int fd)
 {
@@ -17,6 +14,7 @@ void IRCServ::answer_topic(IRCMessage& msg, int fd)
         return;
     }
     std::string ch_name = msg.getParam(0);
+    ft_toLower(ch_name);
     std::map<const std::string, IRCChannel>::iterator it = channels.find(ch_name);
     // ERROR 403
     if (it == channels.end()) {

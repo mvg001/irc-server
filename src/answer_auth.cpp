@@ -13,6 +13,7 @@
 #include "IRCChannel.hpp"
 #include "IRCClient.hpp"
 #include "IRCServ.hpp"
+#include "utils.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -38,12 +39,12 @@ void IRCServ::answer_pass(IRCMessage& msg, int fd)
 
 void IRCServ::answer_nick(IRCMessage& msg, int fd)
 {
-    if (msg.getParameters().first == msg.getParameters().second) {
+    if (msg.getParametersSize() == 0) {
         queue_and_send(fd, ":server 431 :No nickname given\r\n");
         return;
     }
 
-    std::string new_nick = *(msg.getParameters().first);
+    std::string new_nick = msg.getParam(0);
     std::string old_nick = clients[fd].getNick();
 
     if (!IRCClient::isValidNick(new_nick)) {
@@ -52,6 +53,7 @@ void IRCServ::answer_nick(IRCMessage& msg, int fd)
         queue_and_send(fd, err);
         return;
     }
+    ft_toLower(new_nick);
     if (!nickIsUnique(new_nick) && nicks[new_nick] != fd) {
         std::string err = ":server 433 * " + new_nick + " :Nickname is already in use\r\n";
         queue_and_send(fd, err);
@@ -71,21 +73,26 @@ void IRCServ::answer_nick(IRCMessage& msg, int fd)
         sendWelcome(fd);
 }
 
+/*
+Command: USER
+Parameters: <user> <mode> <unused> <realname>
+             0      1      2        3
+*/
 void IRCServ::answer_user(IRCMessage& msg, int fd)
 {
-    if (clients[fd].getUsername() != "") {
+    if (!clients[fd].getUsername().empty()) {
         std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
         queue_and_send(fd, ":server 462 " + nick + " :Unauthorized command\r\n");
         return;
     }
 
-    if (std::distance(msg.getParameters().first, msg.getParameters().second) < 4) {
+    if (msg.getParametersSize() < 4) {
         std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
         queue_and_send(fd, ":server 461 " + nick + " USER :Not enough parameters\r\n");
         return;
     }
 
-    std::string user = *(msg.getParameters().first);
+    std::string user = msg.getParam(0);
 
     if (!IRCClient::isValidUsername(user)) {
         std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
@@ -94,6 +101,8 @@ void IRCServ::answer_user(IRCMessage& msg, int fd)
     }
 
     clients[fd].setUsername(user);
+    std::string userFullName = msg.getParam(3);
+    clients[fd].setFullname(userFullName);
     clients[fd].setFlag(USER_FLAG);
 
     if (clients[fd].checkFlag(NICK_FLAG) && clients[fd].checkFlag(USER_FLAG) && clients[fd].checkFlag(PASS_FLAG))

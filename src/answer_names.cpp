@@ -1,11 +1,8 @@
 #include "IRCChannel.hpp"
-#include "IRCClient.hpp"
-#include "IRCCommand.hpp"
 #include "IRCMessage.hpp"
 #include "IRCServ.hpp"
-#include <sstream>
+#include "utils.hpp"
 #include <string>
-#include <vector>
 
 void IRCServ::answer_names(IRCMessage& msg, int fd)
 {
@@ -17,10 +14,11 @@ void IRCServ::answer_names(IRCMessage& msg, int fd)
             this->send_names_from_channel(it->second, fd);
         return;
     }
-    for (int i = 0; i < size; i++) {
-        std::string channel_name = msg.getParam(i);
+    vector<string> channelNames = split(msg.getParam(0),",");
+    for (size_t i = 0; i < channelNames.size(); i++) {
+        std::string channel_name = channelNames[i];
+        ft_toLower(channel_name);
         std::map<const std::string, IRCChannel>::iterator it = channels.find(channel_name);
-
         if (it != channels.end())
             this->send_names_from_channel(it->second, fd);
     }

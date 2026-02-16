@@ -1,7 +1,7 @@
 #include "IRCChannel.hpp"
-#include "IRCClient.hpp"
 #include "IRCMessage.hpp"
 #include "IRCServ.hpp"
+#include "utils.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -22,6 +22,7 @@ void IRCServ::answer_mode(IRCMessage& msg, int fd)
 
     if (target[0] == '#' || target[0] == '&' || target[0] == '+' || target[0] == '!') {
         // ----- MODO CANAL -----
+        ft_toLower(target);     // channel name case insensitive
         if (channels.find(target) == channels.end()) {
             // ERR_NOSUCHCHANNEL
             std::string rpl = ":" + this->getServerName() + " 403 " + clients[fd].getNick() + " " + target + " :No such channel\r\n";
@@ -129,6 +130,7 @@ void IRCServ::answer_mode(IRCMessage& msg, int fd)
                     break;
                 }
                 std::string user_nick = msg.getParam(arg_idx);
+                ft_toLower(user_nick);
                 if (!channel.checkUser(user_nick)) {
                     // ERR_USERNOTINCHANNEL
                     std::string rpl = ":" + this->getServerName() + " 441 " + clients[fd].getNick() + " " + user_nick + " " + target + " :They aren't on that channel\r\n";

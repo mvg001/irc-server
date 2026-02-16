@@ -1,11 +1,10 @@
 #include "IRCChannel.hpp"
 #include "IRCClient.hpp"
-#include "IRCCommand.hpp"
 #include "IRCMessage.hpp"
 #include "IRCServ.hpp"
+#include "utils.hpp"
 #include <sstream>
 #include <string>
-#include <vector>
 
 void IRCServ::answer_who(IRCMessage& msg, int fd)
 {
@@ -16,6 +15,7 @@ void IRCServ::answer_who(IRCMessage& msg, int fd)
     std::string requestingNick = clients[fd].getNick();
 
     if (target[0] == '#') {
+        ft_toLower(target);
         if (channels.find(target) != channels.end()) {
             IRCChannel& channel = channels[target];
             PairUserMapIterators pairIterators = channel.getUsersIterators();
