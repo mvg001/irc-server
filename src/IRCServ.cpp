@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 11:23:19 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 15:17:31 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -396,7 +396,7 @@ void IRCServ::answer_command(IRCMessage &msg, int fd)
     switch (msg.getCommand())
     {
         // === OBLIGATORIOS por subject ===
-        // case CMD_KICK:     answer_kick(msg, fd);     break;
+        case CMD_KICK:     answer_kick(msg, fd);     break;
         // case CMD_INVITE:   answer_invite(msg, fd);   break;
         case CMD_MODE:     answer_mode(msg, fd);     break;
         case CMD_PASS:     answer_pass(msg, fd);     break;
