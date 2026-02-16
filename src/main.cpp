@@ -17,32 +17,26 @@
 // #include "IRCChannel.hpp"
 // #include "IRCCommand.hpp"
 
-
-
-
-
-
-int main(int ac, char **av)
+int main(int ac, char** av)
 {
-	if (ac != 3) {
-		std::cerr << "Usage: ircserver <port> <client_password>" << std::endl;
-		return 1;
-	}
+    if (ac != 3) {
+        std::cerr << "Usage: ircserver <port> <client_password>" << std::endl;
+        return 1;
+    }
 
-	std::pair<int, bool> pairPort = ft_atoi(av[1]);
-	if (!pairPort.second) {
-		std::cerr << "Invalid server port" << std::endl;
-		return 1;
-	}
+    std::pair<int, bool> pairPort = ft_atoi(av[1]);
+    if (!pairPort.second) {
+        std::cerr << "Invalid server port" << std::endl;
+        return 1;
+    }
 
-	try {
-			IRCServ server(pairPort.first, av[2]);
-			server.run();
-	}
-	catch(std::runtime_error &e) {
-			std::cerr << e.what() << std::endl; 
-			return 1;
-	}
+    try {
+        IRCServ server(pairPort.first, av[2]);
+        server.run();
+    } catch (std::runtime_error& e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
