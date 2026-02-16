@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/04 15:34:32 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/16 14:26:11 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 17:22:08 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include "IRCServ.hpp"
 #include <sstream>
 #include <iostream>
+#include <cerrno>
+
 
 void IRCServ::answer_pass(IRCMessage & msg, int fd)
 {
@@ -40,7 +42,8 @@ void IRCServ::answer_pass(IRCMessage & msg, int fd)
 
 void IRCServ::answer_nick(IRCMessage & msg, int fd)
 {
-	if (msg.getParameters().first == msg.getParameters().second) {
+	if (msg.getParameters().first == msg.getParameters().second)
+	{
 		queue_and_send(fd, ":server 431 :No nickname given\r\n");
 		return;
 	}
@@ -48,13 +51,14 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 	std::string new_nick = *(msg.getParameters().first);
 	std::string old_nick = clients[fd].getNick();
 
-	if (!IRCClient::isValidNick(new_nick)) {
+	if (!IRCClient::isValidNick(new_nick))
+	{
 		std::string err = ":server 432 * " + new_nick + " :Erroneous nickname\r\n";
-		std::cout << "errrrrrrrrrrouneououousssssssssssssssssssssssssssssss" << std::endl;
 		queue_and_send(fd, err);
 		return;
 	}
-	if (!nickIsUnique(new_nick) && nicks[new_nick] != fd) {
+	if (!nickIsUnique(new_nick) && nicks[new_nick] != fd)
+	{
 		std::string err = ":server 433 * " + new_nick + " :Nickname is already in use\r\n";
 		queue_and_send(fd, err);
 		return;
@@ -64,11 +68,12 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 	addToNicks(new_nick, fd);
 	clients[fd].setFlag(NICK_FLAG);
 
-	if (old_nick != "") {
+	if (old_nick != "")
+	{
 		rmFromNicks(old_nick);
 		std::string msg = ":" + old_nick + "!" + clients[fd].getUsername() + "@" + clients[fd].getHost() + " NICK " + new_nick + "\r\n";
 		queue_and_send(fd, msg);
-		broadcast(fd, msg);
+		broadcast(fd, msg, old_nick, new_nick);
 	}
 	else if (clients[fd].checkFlag(NICK_FLAG) && clients[fd].checkFlag(USER_FLAG) && clients[fd].checkFlag(PASS_FLAG)) 
 		sendWelcome(fd);
@@ -113,6 +118,15 @@ void IRCServ::queue_and_send(int fd, std::string data)
     if (sent > 0)
         buffer.erase(0, sent);
 
+		else if (sent == -1) 
+		{
+    	if (errno != EAGAIN && errno != EWOULDBLOCK)
+			{
+        this->set_clientsToBeRemoved(fd); 
+        return;
+			}
+		}
+		
     struct epoll_event ev;
     ev.data.fd = fd;
     ev.events = EPOLLIN | EPOLLET;
@@ -122,7 +136,7 @@ void IRCServ::queue_and_send(int fd, std::string data)
     epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &ev);
 }
 
-void IRCServ::broadcast(int fd, std::string notify_msg)
+void IRCServ::broadcast(int fd, std::string notify_msg, string oldnick, string newnick)
 {
 	std::set<int> targets;
 	targets.insert(fd);
@@ -135,17 +149,22 @@ void IRCServ::broadcast(int fd, std::string notify_msg)
 		string channelName = *chNameIt;
 		if (channels.count(channelName) == 0) continue;
 		PairUserMapIterators uIts = channels[channelName].getUsersIterators();
-		for (map<string,UserMode>::const_iterator uit=uIts.first;
-			uit != uIts.second; ++uit) {
+		
+		for (map<string,UserMode>::const_iterator uit=uIts.first; uit != uIts.second; ++uit)
+		{
 				string nickName = uit->first;
 				if (nicks.count(nickName) == 0) continue;
 				targets.insert(nicks[nickName]);
-		} 
+		}
+		
+		if (oldnick != "" && newnick != "")
+		{
+			channels[channelName].delUser(oldnick);
+			channels[channelName].addUser(newnick);
+		}
 	}
-	for (std::set<int>::iterator it = targets.begin();
-		it != targets.end(); ++it) {
+	for (std::set<int>::iterator it = targets.begin(); it != targets.end(); ++it)
 		queue_and_send(*it, notify_msg);
-	}
 }
 
 void IRCServ::sendWelcome(int fd)

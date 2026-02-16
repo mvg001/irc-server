@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 14:54:46 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 15:01:22 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,19 +177,21 @@ void IRCServ::run()
 			int fd = *it_fd;
 			std::map<int, IRCClient>::iterator it_client = clients.find(fd);
 			
-			//CASO 1: el cliente YA NO EXISTE en el mapa
-			if (it_client == clients.end()){
-				to_remove.erase(it_fd++); //lo quitamos de SET ya que no existe
+
+			if (it_client == clients.end())
+			{
+				to_remove.erase(it_fd++);
 				continue;
 			}
 			
-			//CASO 2: El cliente EXISTE. Lo podemos cerrar?
-			if (it_client->second.getObuffer().empty()){ //si se ha vaciado el buffer...
-				close_client(fd); //llamada segura a eliminarle por que existe.
-				to_remove.erase(it_fd++); //lo quitamos de SET.
-			} else {
-				++it_fd; //aun hay datos en el SET, lo
-			}
+
+			if (it_client->second.getObuffer().empty())
+			{
+				close_client(fd);
+				to_remove.erase(it_fd++);
+			} 
+			else
+				++it_fd;
 		}		
 	}
 }

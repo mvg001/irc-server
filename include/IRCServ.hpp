@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 12:10:26 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 17:10:49 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ public:
 	void			answer_command(IRCMessage & msg, int fd);
 	void			sendWelcome(int fd);
 	void			queue_and_send(int fd, std::string data);
-	void			broadcast(int fd, std::string notify_msg);
+	void			broadcast(int fd, std::string notify_msg, string oldnick = "", string newnick = "");
 	void			broadcastToChannel(IRCChannel & channel, const std::string & message);
 	void			send_names_from_channel(const IRCChannel &channel, int fd);
 
