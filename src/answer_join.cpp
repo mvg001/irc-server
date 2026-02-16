@@ -164,6 +164,7 @@ void IRCServ::answer_join(IRCMessage& msg, int fd)
             ircChannel.setCreatorNick(jClient.getNick());
             jClient.addChannel(channelName);
         }
+        if (ircChannel.checkUser(jClient.getNick())) continue; // already member
         string joinRequest = genJoinReply(jClient, channelName);
         ChannelMode result = ircChannel.addUser(jClient.getNick(), USER_ONLY, key);
         if (result == ADD_USER_OK) {
