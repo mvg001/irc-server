@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 12:42:05 by mvassall          #+#    #+#             */
-/*   Updated: 2026/02/11 14:44:39 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 10:17:02 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,14 +140,14 @@ void  IRCServ::answer_join(IRCMessage& msg, int fd) {
     // 4. Enviar lista de nombres (353) - CORREGIDO
     buf.clear();
     buf << ':' << server_name << " 353 " << newJoinClient.getNick() << " = " << channelName << " :"; // Espacio antes de ':'
-    
-    for (UserMapIterator kvIt = pairIterators.first; kvIt != pairIterators.second; ++kvIt) {
-        if (kvIt != pairIterators.first) buf << " "; // Espacio entre nicks
-        if (kvIt->second == CHANNEL_OPERATOR) buf << '@';
-        buf << kvIt->first;
-    }
-    buf << "\r\n";
-    queue_and_send(newJoinClient.getFd(), buf.str());
+
+		for (UserMapIterator kvIt = pairIterators.first; kvIt != pairIterators.second; ++kvIt) {
+				if (kvIt != pairIterators.first) buf << " "; // Espacio entre nicks
+				if (kvIt->second == CHANNEL_OPERATOR) buf << '@';
+				buf << kvIt->first;
+		}
+		buf << "\r\n";
+		queue_and_send(newJoinClient.getFd(), buf.str());
 
     // 5. Fin de lista de nombres (366) - CORREGIDO
     buf.clear();
