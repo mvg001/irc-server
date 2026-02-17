@@ -25,7 +25,9 @@ void IRCServ::answer_pass(IRCMessage& msg, int fd)
     std::ostringstream recv_pass;
     vectorIteratorPairType range = msg.getParameters();
     for (vector<string>::const_iterator it = range.first; it != range.second; ++it)
+	{
         recv_pass << (it == range.first ? "" : " ") << *it;
+	}
 
 	if (recv_pass.str().empty())
 	{
