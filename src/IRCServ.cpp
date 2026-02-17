@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/17 14:18:23 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/17 14:20:54 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -416,11 +416,6 @@ std::map<const string, IRCChannel>& IRCServ::getChannels(void){
 	return (channels);
 }
 
-//kick
-std::map<const string, IRCChannel>& IRCServ::getChannels(void){
-	return (channels);
-}
-
 //quit
 std::set<int>& IRCServ::get_clientsToBeRemoved(void){
 	return (_clientsToBeRemoved);
@@ -467,7 +462,7 @@ void IRCServ::answer_command(IRCMessage& msg, int fd)
         case CMD_NOTICE:   answer_notice(msg, fd);   break;
         case CMD_PING:     answer_ping(msg, fd);     break;
         case CMD_PONG:     answer_pong(msg, fd);     break;
-		case CMD_CAP:       queue_and_send(fd, rpl); break;
+				case CMD_CAP:       queue_and_send(fd, rpl); break;
 
     default:
         // (???) Enviar error ERR_UNKNOWNCOMMAND (421) al cliente
