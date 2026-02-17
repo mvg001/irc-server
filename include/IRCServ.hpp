@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 17:10:49 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/17 14:17:10 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ public:
 	int 															getFdFromNick(string s);
 	std::string												getServerName(void) const;
 	const std::map<const std::string, int>&	getNicks(void) const; //For privmsg
-	const std::map<const string, IRCChannel>& getChannels(void) const; //privmsg
+	const std::map<const string, IRCChannel>& getChannels(void) const; //Privmsg
+	std::map<const string, IRCChannel>& getChannels(void); //KICK
 	
 	void			run();
 	void			process_client_buffer(int fd);
@@ -74,8 +75,9 @@ public:
 	void			answer_pong(IRCMessage & msg, int fd);
 	void			answer_privmsg(IRCMessage & msg, int fd);
 	void			answer_mode(IRCMessage & msg, int fd);
-		void			answer_notice(IRCMessage & msg, int fd);
-		void			answer_quit(IRCMessage & msg, int fd);
+	void			answer_notice(IRCMessage & msg, int fd);
+	void			answer_quit(IRCMessage & msg, int fd);
+	void			answer_kick(IRCMessage & msg, int fd);
 	void			answer_topic(IRCMessage & msg, int fd);
 	void			answer_names(IRCMessage & msg, int fd);
 	void			answer_who(IRCMessage & msg, int fd);

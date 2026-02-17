@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 15:01:22 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/17 14:18:23 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -411,6 +411,16 @@ const std::map<const string, IRCChannel>& IRCServ::getChannels(void) const
     return (channels);
 }
 
+//kick
+std::map<const string, IRCChannel>& IRCServ::getChannels(void){
+	return (channels);
+}
+
+//kick
+std::map<const string, IRCChannel>& IRCServ::getChannels(void){
+	return (channels);
+}
+
 //quit
 std::set<int>& IRCServ::get_clientsToBeRemoved(void){
 	return (_clientsToBeRemoved);
@@ -439,7 +449,7 @@ void IRCServ::answer_command(IRCMessage& msg, int fd)
     switch (msg.getCommand())
     {
         // === OBLIGATORIOS por subject ===
-        // case CMD_KICK:     answer_kick(msg, fd);     break;
+        case CMD_KICK:     answer_kick(msg, fd);     break;
         case CMD_INVITE:   answer_invite(msg, fd);   break;
         case CMD_MODE:     answer_mode(msg, fd);     break;
         case CMD_PASS:     answer_pass(msg, fd);     break;
