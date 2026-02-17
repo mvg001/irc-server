@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "IRCServ.hpp"
+#include "IRCCommand.hpp"
 #include "utils.hpp"
 #include <cerrno>
 #include <cstring>
@@ -416,11 +417,6 @@ std::map<const string, IRCChannel>& IRCServ::getChannels(void){
 	return (channels);
 }
 
-//kick
-std::map<const string, IRCChannel>& IRCServ::getChannels(void){
-	return (channels);
-}
-
 //quit
 std::set<int>& IRCServ::get_clientsToBeRemoved(void){
 	return (_clientsToBeRemoved);
@@ -448,7 +444,7 @@ void IRCServ::answer_command(IRCMessage& msg, int fd)
 		std::string rpl = ":" + getServerName() + " CAP * LS :\r\n";
     switch (msg.getCommand())
     {
-        // === OBLIGATORIOS por subject ===
+        // === Mandatory by subject ===
         case CMD_KICK:     answer_kick(msg, fd);     break;
         case CMD_INVITE:   answer_invite(msg, fd);   break;
         case CMD_MODE:     answer_mode(msg, fd);     break;
@@ -457,7 +453,7 @@ void IRCServ::answer_command(IRCMessage& msg, int fd)
         case CMD_USER:     answer_user(msg, fd);     break;
         case CMD_QUIT:     answer_quit(msg, fd);     break;
 
-        // // === extras ===
+        // === Bonus ===
         case CMD_JOIN:     answer_join(msg, fd);     break;
         case CMD_PART:     answer_part(msg, fd);     break;
         case CMD_PRIVMSG:  answer_privmsg(msg, fd);  break;
@@ -469,8 +465,11 @@ void IRCServ::answer_command(IRCMessage& msg, int fd)
         case CMD_PONG:     answer_pong(msg, fd);     break;
 		case CMD_CAP:       queue_and_send(fd, rpl); break;
 
+        // === Internal extensions ===
+        case EXT_SHOW:      answer_show(msg, fd);     break;
+
     default:
-        // (???) Enviar error ERR_UNKNOWNCOMMAND (421) al cliente
+        queue_and_send(fd, genErrUnknownCommand(server_name, IRCCommandtoString(msg.getCommand())));
         break;
     }
 }
