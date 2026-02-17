@@ -4,6 +4,7 @@
 #include "IRCClient.hpp"
 #include "IRCServ.hpp"
 #include <sstream>
+#include <iostream>
 #include <string>
 #include <vector>
 

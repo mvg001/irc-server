@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/17 12:02:26 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/17 15:30:08 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ public:
 	void			answer_command(IRCMessage & msg, int fd);
 	void			sendWelcome(int fd);
 	void			queue_and_send(int fd, std::string data);
-	void			broadcast(int fd, std::string notify_msg);
+	void			broadcast(int fd, std::string notify_msg, string oldnick = "", string newnick = "");
 	void			broadcastToChannel(IRCChannel & channel, const std::string & message);
 	void			send_names_from_channel(const IRCChannel &channel, int fd);
 
@@ -103,14 +103,12 @@ private:
 	std::map<int, IRCClient> clients;					// fd -> IRCClient
 	struct epoll_event events[16];
 
-	// nick -> fd
 	// nicknames are case-insensitive
 	std::map<const std::string, int> nicks;		// nick -> fd
 
-	// channelName -> IRCChannel
 	// IRC channel names are case-insensitive
-	std::map<const string, IRCChannel> channels; 
-		std::set<int>	_clientsToBeRemoved; //FDs 
+	std::map<const string, IRCChannel> channels; // channelName -> IRCChannel
+	std::set<int>	_clientsToBeRemoved; //FDs 
 	string server_name;
 };
 #endif

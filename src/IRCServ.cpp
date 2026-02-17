@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/17 12:48:03 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/17 15:30:38 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,9 +169,41 @@ void IRCServ::run()
 				process_client_buffer(fd);
 			}
 		}
+		std::set<int>& to_remove = get_clientsToBeRemoved();
+		std::set<int>::iterator it_fd = to_remove.begin();
+		
+		while (it_fd != to_remove.end())
+		{
+			int fd = *it_fd;
+			std::map<int, IRCClient>::iterator it_client = clients.find(fd);
+			
+
+			if (it_client == clients.end())
+			{
+				to_remove.erase(it_fd++);
+				continue;
+			}
+			
+
+			if (it_client->second.getObuffer().empty())
+			{
+				close_client(fd);
+				to_remove.erase(it_fd++);
+			} 
+			else
+				++it_fd;
+		}		
 	}
 }
  
+
+void printNicks(std::map<const std::string, int> & set)
+{
+    for (std::map<const std::string, int>::const_iterator it = set.begin(); it != set.end(); ++it)
+        std::cout << "Nick: " << it->first << ", Valor: " << it->second << std::endl;
+}
+
+
 void IRCServ::close_client(int fd)
 {
     // 1. Eliminar del epoll
@@ -199,6 +231,7 @@ void IRCServ::close_client(int fd)
         }
         // 4. Limpieza de los mapas globales del servidor
         nicks.erase(nick);
+
         clients.erase(client_it);
     }
     // 5. Cierre físico del socket
@@ -354,7 +387,7 @@ void	IRCServ::check_clients_timeout(void){
 			<< (TIMEOUT + 60) << "seconds\r\n";
 			queue_and_send(fd, msg.str());
 			++it; //note* above
-			close_client(fd); //hay que eliminar el nick y canales en la funcion
+			set_clientsToBeRemoved(fd); //hay que eliminar el nick y canales en la funcion
 		}
 		else
 			++it;
