@@ -1,22 +1,27 @@
-#include "IRCClient.hpp"
-#include "IRCCommand.hpp"
+#include "IRCChannel.hpp"
 #include "IRCMessage.hpp"
 #include "IRCServ.hpp"
-#include "IRCChannel.hpp"
-#include <sstream>
+#include "utils.hpp"
 #include <string>
-#include <vector>
 
-void IRCServ::answer_topic(IRCMessage & msg, int fd)
+void IRCServ::answer_topic(IRCMessage& msg, int fd)
 {
     std::string nick = clients[fd].getNick();
-    if (msg.getParametersSize() < 1) 
-      {queue_and_send(fd, ":" + server_name + " 461 " + nick + " TOPIC :Not enough parameters\r\n"); return;}
-
+    // ERROR 461
+    if (msg.getParametersSize() < 1) {
+        std::string err = ":" + server_name + " 461 " + nick + " TOPIC :Not enough parameters\r\n";
+        queue_and_send(fd, err);
+        return;
+    }
     std::string ch_name = msg.getParam(0);
+    ft_toLower(ch_name);
     std::map<const std::string, IRCChannel>::iterator it = channels.find(ch_name);
-    if (it == channels.end()) 
-    	{queue_and_send(fd, ":" + server_name + " 403 " + nick + " " + ch_name + " :No such channel\r\n"); return;}
+    // ERROR 403
+    if (it == channels.end()) {
+        std::string err = ":" + server_name + " 403 " + nick + " " + ch_name + " :No such channel\r\n";
+        queue_and_send(fd, err);
+        return;
+    }
 
     IRCChannel & channel = it->second;
     if (!channel.checkUser(nick))
@@ -47,9 +52,8 @@ void IRCServ::broadcastToChannel(IRCChannel & channel, const std::string & messa
 {
     PairUserMapIterators users = channel.getUsersIterators();
 
-    for (UserMapIterator it = users.first; it != users.second; ++it)
-    {
-        std::map<const std::string, int>::iterator target_fd = nicks.find(it->first); 
+    for (UserMapIterator it = users.first; it != users.second; ++it) {
+        std::map<const std::string, int>::iterator target_fd = nicks.find(it->first);
         if (target_fd != nicks.end())
             queue_and_send(target_fd->second, message);
     }

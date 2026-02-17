@@ -6,19 +6,17 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/17 15:30:08 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/17 16:35:50 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #ifndef IRCSERV_HPP
 #define IRCSERV_HPP
 
-
-#include <sys/epoll.h>
-#include <map>
 #include <fcntl.h>
+#include <map>
 #include <netinet/in.h>
+#include <sys/epoll.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -27,13 +25,13 @@
 #include "IRCMessage.hpp"
 
 #define SERVER_NAME "42_irc_server"
-#define TIMEOUT	120 //seconds
+#define TIMEOUT 120 // seconds
 
 class IRCServ {
 public:
-	IRCServ();
-	IRCServ(int listening_port, std::string password);
-	~IRCServ();
+    IRCServ();
+    IRCServ(int listening_port, std::string password);
+    ~IRCServ();
 
 	int																getListeningSocket() const;
 	void															setListeningSocket(int socket);
@@ -83,6 +81,7 @@ public:
 	void			answer_topic(IRCMessage & msg, int fd);
 	void			answer_names(IRCMessage & msg, int fd);
 	void			answer_who(IRCMessage & msg, int fd);
+	void			answer_invite(IRCMessage & msg, int fd);
 	//timeout checkout
 	void			send_ping_to_client(int fd);
 	void			check_clients_timeout(void);
@@ -97,12 +96,13 @@ public:
 
 
 private:
-	int listening_socket;
-	std::string clientPassword;
-	int epoll_fd;
-	std::map<int, IRCClient> clients;					// fd -> IRCClient
-	struct epoll_event events[16];
+    int listening_socket;
+    std::string clientPassword;
+    int epoll_fd;
+    std::map<int, IRCClient> clients; // fd -> IRCClient
+    struct epoll_event events[16];
 
+	// nick -> fd
 	// nicknames are case-insensitive
 	std::map<const std::string, int> nicks;		// nick -> fd
 

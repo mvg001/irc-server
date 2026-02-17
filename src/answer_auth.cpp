@@ -13,18 +13,21 @@
 #include "IRCChannel.hpp"
 #include "IRCClient.hpp"
 #include "IRCServ.hpp"
-#include <sstream>
+#include "utils.hpp"
 #include <iostream>
+#include <sstream>
 #include <cerrno>
 #include <ctime>
 
 
-void IRCServ::answer_pass(IRCMessage & msg, int fd)
+void IRCServ::answer_pass(IRCMessage& msg, int fd)
 {
-	std::ostringstream recv_pass;
-	vectorIteratorPairType range = msg.getParameters();
-	for (vector<string>::const_iterator it = range.first; it != range.second; ++it)
-		recv_pass << (it == range.first ? "" : " ") << *it;
+    std::ostringstream recv_pass;
+    vectorIteratorPairType range = msg.getParameters();
+    for (vector<string>::const_iterator it = range.first; it != range.second; ++it)
+	{
+        recv_pass << (it == range.first ? "" : " ") << *it;
+	}
 
 	if (recv_pass.str().empty())
 	{
@@ -41,16 +44,15 @@ void IRCServ::answer_pass(IRCMessage & msg, int fd)
 	clients[fd].setFlag(PASS_FLAG);
 }
 
-void IRCServ::answer_nick(IRCMessage & msg, int fd)
+void IRCServ::answer_nick(IRCMessage& msg, int fd)
 {
-	if (msg.getParameters().first == msg.getParameters().second)
-	{
-		queue_and_send(fd, ":server 431 :No nickname given\r\n");
-		return;
-	}
+    if (msg.getParametersSize() == 0) {
+        queue_and_send(fd, ":server 431 :No nickname given\r\n");
+        return;
+    }
 
-	std::string new_nick = *(msg.getParameters().first);
-	std::string old_nick = clients[fd].getNick();
+    std::string new_nick = msg.getParam(0);
+    std::string old_nick = clients[fd].getNick();
 
 	if (!IRCClient::isValidNick(new_nick))
 	{
@@ -65,9 +67,9 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 		return;
 	}
 
-	clients[fd].setNick(new_nick);
-	addToNicks(new_nick, fd);
-	clients[fd].setFlag(NICK_FLAG);
+    clients[fd].setNick(new_nick);
+    addToNicks(new_nick, fd);
+    clients[fd].setFlag(NICK_FLAG);
 
 	if (old_nick != "")
 	{
@@ -80,41 +82,48 @@ void IRCServ::answer_nick(IRCMessage & msg, int fd)
 		sendWelcome(fd);
 }
 
-void IRCServ::answer_user(IRCMessage & msg, int fd)
+/*
+Command: USER
+Parameters: <user> <mode> <unused> <realname>
+             0      1      2        3
+*/
+void IRCServ::answer_user(IRCMessage& msg, int fd)
 {
-	if (clients[fd].getUsername() != "") {
-		std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
-		queue_and_send(fd, ":server 462 " + nick + " :Unauthorized command\r\n");
-		return;
-	}
+    if (!clients[fd].getUsername().empty()) {
+        std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
+        queue_and_send(fd, ":server 462 " + nick + " :Unauthorized command\r\n");
+        return;
+    }
 
-	if (std::distance(msg.getParameters().first, msg.getParameters().second) < 4) {
-		std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
-		queue_and_send(fd, ":server 461 " + nick + " USER :Not enough parameters\r\n");
-		return;
-	}
+    if (msg.getParametersSize() < 4) {
+        std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
+        queue_and_send(fd, ":server 461 " + nick + " USER :Not enough parameters\r\n");
+        return;
+    }
 
-	std::string user = *(msg.getParameters().first);
+    std::string user = msg.getParam(0);
 
-	if (!IRCClient::isValidUsername(user)) {
-		std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
-		queue_and_send(fd, ":server 432 " + nick + " :Erroneous username\r\n");
-		return;
-	}
+    if (!IRCClient::isValidUsername(user)) {
+        std::string nick = clients[fd].getNick().empty() ? "*" : clients[fd].getNick();
+        queue_and_send(fd, ":server 432 " + nick + " :Erroneous username\r\n");
+        return;
+    }
 
-	clients[fd].setUsername(user);
-	clients[fd].setFlag(USER_FLAG);
+    clients[fd].setUsername(user);
+    std::string userFullName = msg.getParam(3);
+    clients[fd].setFullname(userFullName);
+    clients[fd].setFlag(USER_FLAG);
 
-	if (clients[fd].checkFlag(NICK_FLAG) && clients[fd].checkFlag(USER_FLAG) && clients[fd].checkFlag(PASS_FLAG)) 
-		sendWelcome(fd);
+    if (clients[fd].checkFlag(NICK_FLAG) && clients[fd].checkFlag(USER_FLAG) && clients[fd].checkFlag(PASS_FLAG))
+        sendWelcome(fd);
 }
 
 void IRCServ::queue_and_send(int fd, std::string data)
 {
     clients[fd].addToObuffer(data);
 
-    std::string &buffer = clients[fd].getObuffer();
-    
+    std::string& buffer = clients[fd].getObuffer();
+
     ssize_t sent = send(fd, buffer.c_str(), buffer.size(), MSG_NOSIGNAL);
     if (sent > 0)
         buffer.erase(0, sent);
@@ -132,15 +141,15 @@ void IRCServ::queue_and_send(int fd, std::string data)
     ev.data.fd = fd;
     ev.events = EPOLLIN | EPOLLET;
     if (!buffer.empty())
-      ev.events |= EPOLLOUT;
+        ev.events |= EPOLLOUT;
 
     epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &ev);
 }
 
 void IRCServ::broadcast(int fd, std::string notify_msg, string oldnick, string newnick)
 {
-	std::set<int> targets;
-	targets.insert(fd);
+    std::set<int> targets;
+    targets.insert(fd);
 
 	if (clients.count(fd) == 0) return;
 	IRCClient client = clients[fd];
@@ -189,6 +198,6 @@ void IRCServ::sendWelcome(int fd)
     std::string rpl004 = ":" + sName + " 004 " + nick + " " + sName + " 1.0 i ntklo\r\n";
     queue_and_send(fd, rpl004);
 
-		std::string rpl376 = ":" + sName + " 376 " + nick + " :End of /MOTD command.\r\n";
-		queue_and_send(fd, rpl376);
+    std::string rpl376 = ":" + sName + " 376 " + nick + " :End of /MOTD command.\r\n";
+    queue_and_send(fd, rpl376);
 }
