@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   answer_kick.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/16 15:17:10 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/17 12:52:27 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/17 16:27:51 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,7 @@ void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 			queue_and_send(fd, reply.str());
 		}	
 	}
+
 	
 	//if empty of users because autokick then remove it from server.
 	if (kick_channel.getNumberOfUsers() == 0)
