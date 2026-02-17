@@ -1,7 +1,8 @@
 #include "IRCChannel.hpp"
 #include "IRCMessage.hpp"
 #include "IRCServ.hpp"
-#include "utils.hpp"
+#include <sstream>
+#include <iostream>
 #include <string>
 
 void IRCServ::answer_names(IRCMessage& msg, int fd)

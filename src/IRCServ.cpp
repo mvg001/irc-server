@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 10:29:31 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/16 15:01:22 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,20 +160,57 @@ void IRCServ::run()
                 + strerror(errno));
         }
 
-        for (int i = 0; i < ready; ++i) {
-            int fd = events[i].data.fd;
-            if (fd == listening_socket)
-                accept_new_connection();
-            else {
-                if (events[i].events & EPOLLOUT)
-                    this->queue_and_send(fd, "");
-                if (read_from_client(clients[fd]))
-                    close_client(fd);
-                process_client_buffer(fd);
-            }
-        }
-    }
+		for (int i = 0; i < ready; ++i)
+		{
+			int fd = events[i].data.fd;
+			if (fd == listening_socket)
+				accept_new_connection();
+			else
+			{
+				if (events[i].events & EPOLLOUT)
+					this->queue_and_send(fd, ""); 
+				if (read_from_client(clients[fd]))
+				{
+					close_client(fd);
+					continue ;
+				}
+				process_client_buffer(fd);
+			}
+		}
+		std::set<int>& to_remove = get_clientsToBeRemoved();
+		std::set<int>::iterator it_fd = to_remove.begin();
+		
+		while (it_fd != to_remove.end())
+		{
+			int fd = *it_fd;
+			std::map<int, IRCClient>::iterator it_client = clients.find(fd);
+			
+
+			if (it_client == clients.end())
+			{
+				to_remove.erase(it_fd++);
+				continue;
+			}
+			
+
+			if (it_client->second.getObuffer().empty())
+			{
+				close_client(fd);
+				to_remove.erase(it_fd++);
+			} 
+			else
+				++it_fd;
+		}		
+	}
 }
+ 
+
+void printNicks(std::map<const std::string, int> & set)
+{
+    for (std::map<const std::string, int>::const_iterator it = set.begin(); it != set.end(); ++it)
+        std::cout << "Nick: " << it->first << ", Valor: " << it->second << std::endl;
+}
+
 
 void IRCServ::close_client(int fd)
 {
@@ -198,6 +235,7 @@ void IRCServ::close_client(int fd)
         }
         // 4. Limpieza de los mapas globales del servidor
         nicks.erase(nick);
+
         clients.erase(client_it);
     }
     // 5. Cierre físico del socket
@@ -255,24 +293,25 @@ bool IRCServ::read_from_client(IRCClient& client)
         if (n > 0)
             client.addToIbuffer(tmp, n);
 
-        else if (client.getIbuffer().size() > 4000) {
-            std::cerr << "Client flooding, disconnecting..." << std::endl;
-            close_client(client.getFd());
-            return true;
-        } else if (n == 0)
-            return true;
-        else {
-            // el hecho de que errno haya sido llenado con estos numeros
-            //    por recv() significa que llegamos al final del buffer
-            if (errno == EAGAIN || errno == EWOULDBLOCK)
-                return false;
-            else if (errno == EINTR)
-                continue;
-            else
-                throw std::runtime_error(std::string("recv(): ")
-                    + strerror(errno));
-        }
-    }
+		else if (client.getIbuffer().size() > 4000) {
+			std::cerr << "Client flooding, disconnecting..." << std::endl;
+			close_client(client.getFd());
+			return true;
+		}
+		else if (n == 0)
+			return true;
+		else
+		{
+			// el hecho de que errno haya sido llenado con estos numeros
+			//    por recv() significa que llegamos al final del buffer
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				return false;
+			else if (errno == EINTR)
+				continue;
+			else
+				return false;
+		}
+	}
 }
 
 void IRCServ::process_client_buffer(int fd)
@@ -341,22 +380,23 @@ void IRCServ::check_clients_timeout(void)
             ++it;
         }
 
-        // If it didnt reply to PING with PONG in 60 seconds more we kick it
-        /*note*: If the ++it would be only in the for and not in each 'if' as it is now,
-        when we remove a client, and we make in the for the ++it, it would produce a segfaul
-        We cannot have only an ++it here in that case and the for one, because we would
-        jump over an valid one making it = it + 2. */
-
-        else if (now - last > TIMEOUT + 60) {
-            std::ostringstream msg;
-            msg << "ERROR :Closign Link: Ping timeout: "
-                << (TIMEOUT + 60) << "seconds\r\n";
-            queue_and_send(fd, msg.str());
-            ++it; // note* above
-            close_client(fd); // hay que eliminar el nick y canales en la funcion
-        } else
-            ++it;
-    }
+		//If it didnt reply to PING with PONG in 60 seconds more we kick it
+		/*note*: If the ++it would be only in the for and not in each 'if' as it is now,
+		when we remove a client, and we make in the for the ++it, it would produce a segfaul
+		We cannot have only an ++it here in that case and the for one, because we would
+		jump over an valid one making it = it + 2. */
+		
+		else if (now - last > TIMEOUT + 60){
+			std::ostringstream msg;
+			msg << "ERROR :Closign Link: Ping timeout: "
+			<< (TIMEOUT + 60) << "seconds\r\n";
+			queue_and_send(fd, msg.str());
+			++it; //note* above
+			set_clientsToBeRemoved(fd); //hay que eliminar el nick y canales en la funcion
+		}
+		else
+			++it;
+	}
 }
 
 // privmsg
@@ -380,7 +420,6 @@ std::set<int>& IRCServ::get_clientsToBeRemoved(void){
 void					IRCServ::set_clientsToBeRemoved(int fd){
 	_clientsToBeRemoved.insert(fd);
 }
-
 
 /** Deletes an empty channel (number of users == 0) */
 void IRCServ::delEmptyChannel(const string channelName)
