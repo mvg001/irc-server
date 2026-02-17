@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/17 14:20:54 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/17 17:53:44 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,10 +170,7 @@ void IRCServ::run()
 				if (events[i].events & EPOLLOUT)
 					this->queue_and_send(fd, ""); 
 				if (read_from_client(clients[fd]))
-				{
-					close_client(fd);
 					continue ;
-				}
 				process_client_buffer(fd);
 			}
 		}
@@ -295,7 +292,7 @@ bool IRCServ::read_from_client(IRCClient& client)
 
 		else if (client.getIbuffer().size() > 4000) {
 			std::cerr << "Client flooding, disconnecting..." << std::endl;
-			close_client(client.getFd());
+			set_clientsToBeRemoved(client.getFd());
 			return true;
 		}
 		else if (n == 0)
@@ -469,3 +466,9 @@ void IRCServ::answer_command(IRCMessage& msg, int fd)
         break;
     }
 }
+
+
+
+
+
+

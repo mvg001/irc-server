@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/16 15:17:10 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/17 16:27:51 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/17 16:45:00 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,3 +131,4 @@ void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 	if (kick_channel.getNumberOfUsers() == 0)
 		delEmptyChannel(kick_channel_name);
 }
+
