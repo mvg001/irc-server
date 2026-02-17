@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 15:18:17 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/17 12:02:26 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ public:
 	int 															getFdFromNick(string s);
 	std::string												getServerName(void) const;
 	const std::map<const std::string, int>&	getNicks(void) const; //For privmsg
-	const std::map<const string, IRCChannel>& getChannels(void) const; //privmsg
+	const std::map<const string, IRCChannel>& getChannels(void) const; //Privmsg
+	std::map<const string, IRCChannel>& getChannels(void); //KICK
 	
 	void			run();
 	void			process_client_buffer(int fd);

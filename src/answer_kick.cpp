@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/16 15:17:10 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/16 17:38:36 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/17 12:52:27 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,88 +15,42 @@
 #include <sstream>
 
 typedef std::map<int, IRCClient>::iterator SENDER;
-//typedef	std::pair<std::string, std::string> PAIR_STRING;
-//typedef std::map<const std::string, int>::const_iterator NICK; 
 
-//need pair because I will reuse the reason the user gives (the parameters msg)
-//into the ERROR that sends the server to the sender of QUIT so must separate prefix from msg.
-/* PAIR_STRING	compose_reply(const IRCMessage& msg, const SENDER it_sender){
-	std::ostringstream prefix;
-	std::ostringstream message;
-	PAIR_STRING prefix_msg;
+void	removeClientFromChannel(const std::vector<std::string>& parameters, IRCClient& sender, std::string victim, IRCChannel& my_channel, IRCServ& server){
+	std::ostringstream 	reply;
+	int									victim_fd;
 
-	vectorIteratorPairType it_msg = msg.getParameters();
-	
-	//compose prefix
-	std::string	sender_nick = it_sender->second.getNick();
-	if (sender_nick == "")
-		sender_nick = "*";
-	string			sender_user = it_sender->second.getUsername();
-	string			sender_host	= it_sender->second.getHost();
-	prefix << ":" << sender_nick << "!" << sender_user << "@" << sender_host << " QUIT :";
-	
-	//compose menssage, with msg received(parameters)
-	if (it_msg.first != it_msg.second){ 
-		for (; it_msg.first != it_msg.second; ++it_msg.first){
-			message << *it_msg.first;
-			if ((it_msg.first + 1) != it_msg.second)
-				message << " ";
-		}
+	//compose reply msg to all users on the channel.
+	reply << ":" << sender.getNick() << "!" << sender.getUsername() << "@" << sender.getHost() << " KICK "
+	<< my_channel.getName() << " " << victim << " :";
+	for (size_t i = 2; i < parameters.size(); ++i){	
+		reply << parameters[i];
+		if (i + 1 != parameters.size())
+			reply << " ";	
 	}
-	//without msg (no parameters)
+	if (parameters.size() == 2)
+		reply << sender.getNick();
+	reply << "\r\n";
+
+	//send to all users of the channel.
+	server.broadcastToChannel(my_channel, reply.str());
+
+	//remove the user from the channel
+	my_channel.delUser(victim);
+
+	//remove the channel from the victim IRCClient
+	std::map<int, IRCClient>&	clients	= server.getClients();
+	const std::map<const std::string, int>& nicks = server.getNicks();
+	std::map<const std::string, int>::const_iterator it_nicks = nicks.find(victim);
+	if (it_nicks != nicks.end())
+		victim_fd = it_nicks->second;
 	else
-		message << sender_nick << " is leaving";
-	
-	prefix_msg.first = prefix.str();
-	prefix_msg.second = message.str();
-	return (prefix_msg);
+		return ;
+	std::map<int, IRCClient>::iterator it_clients = clients.find(victim_fd);
+	if (it_clients != clients.end())
+		it_clients->second.delChannel(my_channel.getName());
 }
 
-void	send_reply_to_users(const PAIR_STRING& pre_msg, const std::string& nick, int fd, IRCServ& server){
-	//0. prepare a SET of FDs to not repeat msg sent to same user in other channel shared.
-	std::set<int>	fd_sent;
-	std::set<int>::iterator it_fd;
-	
-	//1. have the clientes from server.
-	const std::map<int, IRCClient>& clients = server.getClients();
-	std::map<int, IRCClient>::const_iterator it_clients = clients.find(fd);
-	if (it_clients == clients.end())
-		return ;
-	
-	//2. extract channels where our sender is subscribed
-	pairIterators it_chan = it_clients->second.getChannelIterators(); //have the iterators (begin/end) of sender channels subscribed
-	
-	//3. Look in each channel for nicks subscribed and send the msg to them.
-	const std::map<const string, IRCChannel>& channels = server.getChannels();
-	const std::map<const std::string, int>& nicks = server.getNicks();
-	int 				target_fd;
-	std::string	target_nick;
-	std::string target_msg;
-	
-	target_msg = pre_msg.first + pre_msg.second + "\r\n";
-	while (it_chan.first != it_chan.second){ //run all the set of channels subscribed
-		std::string	channel = *it_chan.first;
-		
-		//grab the iterators in IRCChannel where SENDER is subscribed
-		std::map<string, IRCChannel>::const_iterator it_found_chan = channels.find(channel);
-		if (it_found_chan != channels.end()){
-			PairUserMapIterators it_chann_users = it_found_chan->second.getUsersIterators(); //OOOOH MAMA MY MIND!!!!
-			for (; it_chann_users.first != it_chann_users.second; ++it_chann_users.first){
-				NICK it_nick = nicks.find(it_chann_users.first->first);
-				if (it_nick != nicks.end()){
-					target_nick = it_chann_users.first->first;
-					target_fd = it_nick->second;
-					it_fd = fd_sent.find(target_fd);
-					if (nick != target_nick && it_fd == fd_sent.end()){
-						server.queue_and_send(target_fd, target_msg);
-						fd_sent.insert(target_fd);
-					}
-				}
-			}
-		}
-		it_chan.first++;
-	}
-} */
 
 void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 	std::ostringstream reply;
@@ -123,8 +77,8 @@ void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 	std::string	kick_channel_name = *it_param; 
 	
 	//check if the channel exist in server
-	const std::map<const string, IRCChannel>& server_channels = getChannels();
-	std::map<const string, IRCChannel>::const_iterator it_server_channels = server_channels.find(kick_channel_name);
+	std::map<const string, IRCChannel>& server_channels = getChannels();
+	std::map<const string, IRCChannel>::iterator it_server_channels = server_channels.find(kick_channel_name);
 	if (it_server_channels == server_channels.end()){ //not found in server channels
 		reply << ":" << getServerName() << " 403 " << sender_nick << " " << kick_channel_name << " :No such channel\r\n"; 
 		queue_and_send(fd, reply.str());
@@ -141,7 +95,7 @@ void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 	}
 	
 	//Check if the user is operator of that channel.
-	const IRCChannel&	kick_channel = it_server_channels->second;	
+	IRCChannel&	kick_channel = it_server_channels->second;	
 	UserMode mode = kick_channel.getUserMode(sender_nick);
 	if (mode == UNDEF){
 		reply << ":" << getServerName() << " 442 " << sender_nick << " " << kick_channel_name <<  ":You're not on that channel\r\n"; 
@@ -164,32 +118,15 @@ void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 		reply.str("");
 		reply.clear();
 		victim_mode = kick_channel.getUserMode(victim);
-		if (victim_mode != UNDEF){
-			//llamar a la funcion de eliminarlo.
-		}
+		if (victim_mode != UNDEF)
+			removeClientFromChannel(parameters, sender, victim, kick_channel, *this);
 		else {
 			reply << ":" << getServerName() << " 441 " << sender_nick << " " << victim << " " << kick_channel_name << " :They aren't on that channel\r\n";
 			queue_and_send(fd, reply.str());
 		}	
 	}
 	
-	
-
-
-	
-	//compose the reply to users that shares same channels with sender.	
-	//PAIR_STRING	prefix_message = compose_reply(msg, it_sender); //.second (message) needs the \r\n when broadcast.
-	
-	//Compose reply to USER that orders QUIT
-	//std::ostringstream reply_sender;
-	//reply_sender << "ERROR :Closing Link: " << it_sender->second.getHost() << " Quit(" << prefix_message.second << ")\r\n";
-	
-	//send QUIT msg to shared channels users.
-	//send_reply_to_users(prefix_message, sender_nick, fd, *this);
-	
-	//send ERROR QUIT msg to SENDER
-	//queue_and_send(fd, reply_sender.str());
-	 
-	//mark the user to be eliminated from server in the loop.
-	//set_clientsToBeRemoved(fd);
+	//if empty of users because autokick then remove it from server.
+	if (kick_channel.getNumberOfUsers() == 0)
+		delEmptyChannel(kick_channel_name);
 }

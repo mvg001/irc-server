@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/16 15:17:31 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/17 12:48:03 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -368,6 +368,11 @@ const std::map<const std::string, int>&	IRCServ::getNicks(void) const{
 
 //privmsg
 const std::map<const string, IRCChannel>& IRCServ::getChannels(void) const{
+	return (channels);
+}
+
+//kick
+std::map<const string, IRCChannel>& IRCServ::getChannels(void){
 	return (channels);
 }
 
