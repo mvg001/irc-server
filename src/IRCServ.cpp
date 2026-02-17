@@ -6,7 +6,7 @@
 /*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/17 17:53:44 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/17 19:18:48 by marcoga2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ IRCServ::IRCServ(int listening_port, std::string password)
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listening_socket, &ev) == -1)
         close(epoll_fd);
 
-    std::cout << "🎧 Servidor escuchando en puerto " << listening_port
+    std::cout << "ft_irc is running" << listening_port
               << "..." << std::endl;
     return;
 }
@@ -206,39 +206,90 @@ void IRCServ::run()
 void printNicks(std::map<const std::string, int> & set)
 {
     for (std::map<const std::string, int>::const_iterator it = set.begin(); it != set.end(); ++it)
-        std::cout << "Nick: " << it->first << ", Valor: " << it->second << std::endl;
+        std::cout << "Nick: " << it->first << ", Value: " << it->second << std::endl;
 }
 
 
 void IRCServ::close_client(int fd)
 {
-    // 1. Eliminar del epoll
+    std::map<int, IRCClient>::iterator client_it = clients.find(fd);
+    if (client_it == clients.end()) {
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+        close(fd);
+        return;
+    }
+
+    std::string nick = client_it->second.getNick();
+    std::string user = client_it->second.getUsername();
+    std::string host = client_it->second.getHost();
+
+    // Si el nick está vacío, usar "*" según RFC
+    if (nick.empty())
+        nick = "*";
+
+    // Razón hardcodeada
+    std::string quit_reason = "Client Quit";
+
+    // 1. Componer el mensaje QUIT según RFC 2812: :nick!user@host QUIT :reason
+    std::ostringstream quit_msg;
+    quit_msg << ":" << nick << "!" << user << "@" << host << " QUIT :" << quit_reason << "\r\n";
+    std::string quit_message = quit_msg.str();
+
+    // 2. Notificar a todos los usuarios que comparten canales con el emisor
+    std::set<int> fd_sent;
+    pairIterators it_chan = client_it->second.getChannelIterators();
+
+    while (it_chan.first != it_chan.second) {
+        std::string channel_name = *it_chan.first;
+        std::map<const std::string, IRCChannel>::iterator it_found_chan = channels.find(channel_name);
+
+        if (it_found_chan != channels.end()) {
+            PairUserMapIterators it_chann_users = it_found_chan->second.getUsersIterators();
+            for (; it_chann_users.first != it_chann_users.second; ++it_chann_users.first) {
+                const std::string& t_nick = it_chann_users.first->first;
+                std::map<const std::string, int>::const_iterator it_n = nicks.find(t_nick);
+
+                if (it_n != nicks.end()) {
+                    int t_fd = it_n->second;
+                    if (t_fd != fd && fd_sent.find(t_fd) == fd_sent.end()) {
+                        queue_and_send(t_fd, quit_message);
+                        fd_sent.insert(t_fd);
+                    }
+                }
+            }
+        }
+        ++it_chan.first;
+    }
+
+    // 3. Enviar ERROR al cliente según RFC 2812
+    std::ostringstream error_msg;
+    error_msg << "ERROR :Closing Link: " << host << " (Quit: " << quit_reason << ")\r\n";
+    queue_and_send(fd, error_msg.str());
+
+    // 4. Eliminar del epoll
     if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL) == -1)
         std::cerr << "Error eliminando fd de epoll: " << strerror(errno) << std::endl;
 
-    std::map<int, IRCClient>::iterator client_it = clients.find(fd);
-    if (client_it != clients.end()) {
-        std::string nick = client_it->second.getNick();
-        // 3. Bucle que itera por los canales y borra el usuario de todos ellos
-        std::map<const std::string, IRCChannel>::iterator ch_it = channels.begin();
-        while (ch_it != channels.end()) {
-            ch_it->second.delUser(nick);
-            // Lógica estándar de IRC: Si el canal no tiene más usuarios, se borra el canal
-            if (ch_it->second.getNumberOfUsers() == 0) {
-                std::map<const std::string, IRCChannel>::iterator to_erase = ch_it;
-                ++ch_it;
-                channels.erase(to_erase);
-            } else
-                ++ch_it;
+    // 5. Eliminar usuario de todos los canales
+    std::map<const std::string, IRCChannel>::iterator ch_it = channels.begin();
+    while (ch_it != channels.end()) {
+        ch_it->second.delUser(nick);
+        if (ch_it->second.getNumberOfUsers() == 0) {
+            std::map<const std::string, IRCChannel>::iterator to_erase = ch_it;
+            ++ch_it;
+            channels.erase(to_erase);
+        } else {
+            ++ch_it;
         }
-        // 4. Limpieza de los mapas globales del servidor
-        nicks.erase(nick);
-
-        clients.erase(client_it);
     }
-    // 5. Cierre físico del socket
+
+    // 6. Limpieza de los mapas globales
+    nicks.erase(nick);
+    clients.erase(client_it);
+
+    // 7. Cierre físico del socket
     close(fd);
-    std::cout << "Cliente [" << fd << "] desconectado" << std::endl;
+    std::cout << "Client [" << fd << "] disconected" << std::endl;
 }
 
 // Acepta una nueva conexión entrante en listening_socket.
@@ -276,7 +327,7 @@ void IRCServ::accept_new_connection()
     clients[fd] = IRCClient(fd);
     clients[fd].setHost(host);
 
-    std::cout << "Nueva conexión: fd=" << fd << " host=" << host << std::endl;
+    std::cout << "New conexion: fd=" << fd << " host=" << host << std::endl;
 }
 
 // Lee todo lo disponible en modo non-blocking (EPOLLET) desde fd.
@@ -339,7 +390,7 @@ void IRCServ::process_client_buffer(int fd)
             ircMsg = IRCMessage::parse(raw_line);
             std::cout << fd << ": " << ircMsg.toString() << std::endl;
         } catch (...) {
-            std::cerr << fd << ": Error parsing => " << raw_line << std::endl;
+            std::cerr << fd << "-> this input: " << raw_line << " wont trigger anything" << std::endl;
         }
         answer_command(ircMsg, fd);
     }
