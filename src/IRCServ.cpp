@@ -401,7 +401,7 @@ void IRCServ::answer_command(IRCMessage& msg, int fd)
     {
         // === OBLIGATORIOS por subject ===
         // case CMD_KICK:     answer_kick(msg, fd);     break;
-        // case CMD_INVITE:   answer_invite(msg, fd);   break;
+        case CMD_INVITE:   answer_invite(msg, fd);   break;
         case CMD_MODE:     answer_mode(msg, fd);     break;
         case CMD_PASS:     answer_pass(msg, fd);     break;
         case CMD_NICK:     answer_nick(msg, fd);     break;
@@ -418,7 +418,7 @@ void IRCServ::answer_command(IRCMessage& msg, int fd)
         case CMD_NOTICE:   answer_notice(msg, fd);   break;
         case CMD_PING:     answer_ping(msg, fd);     break;
         case CMD_PONG:     answer_pong(msg, fd);     break;
-				case CMD_CAP:       queue_and_send(fd, rpl); break;
+		case CMD_CAP:       queue_and_send(fd, rpl); break;
 
     default:
         // (???) Enviar error ERR_UNKNOWNCOMMAND (421) al cliente

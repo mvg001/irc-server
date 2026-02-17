@@ -79,6 +79,7 @@ public:
 	void			answer_topic(IRCMessage & msg, int fd);
 	void			answer_names(IRCMessage & msg, int fd);
 	void			answer_who(IRCMessage & msg, int fd);
+	void			answer_invite(IRCMessage & msg, int fd);
 	//timeout checkout
 	void			send_ping_to_client(int fd);
 	void			check_clients_timeout(void);

@@ -15,6 +15,7 @@
 #include "IRCServ.hpp"
 #include "utils.hpp"
 #include <cstddef>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -151,13 +152,14 @@ ChannelMode IRCChannel::addUser(
     }
     if (checkChannelMode(USER_LIMIT) && nicks.size() >= userLimit)
         return USER_LIMIT;
-    if (checkChannelMode(INVITE_ONLY) && !checkInvitedNick(nick)) {
+    if (checkChannelMode(INVITE_ONLY) && !checkInvitedNick(lcNick)) {
         return INVITE_ONLY;
     }
     if (checkChannelMode(KEY) && (userKey != key)) {
         return KEY;
     }
     nicks[lcNick] = userMode;
+    if (checkInvitedNick(lcNick)) delInvitedNick(lcNick);
     return ADD_USER_OK;
 }
 
