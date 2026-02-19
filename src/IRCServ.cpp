@@ -84,7 +84,7 @@ IRCServ::IRCServ(int listening_port, std::string password)
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listening_socket, &ev) == -1)
         close(epoll_fd);
 
-    std::cout << "ft_irc is running" << listening_port
+    std::cout << "ft_irc is listening at " << listening_port
               << "..." << std::endl;
     return;
 }

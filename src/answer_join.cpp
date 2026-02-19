@@ -136,6 +136,7 @@ void IRCServ::answer_join(IRCMessage& msg, int fd)
             IRCChannel ircChannel = channels[channelName];
             partChannel(*this, jClient, ircChannel, "");
             channels[channelName] = ircChannel;
+            delEmptyChannel(channelName);
         }
         return;
     }

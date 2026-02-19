@@ -37,6 +37,8 @@ NAME = ircserv
 .PHONY: all clean fclean re
 
 all: $(NAME)
+konfu: src/konfu.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 # 3. La regla corregida para encontrar los .cpp dentro de SRC_DIR
 $(BUILD_DIR)/%.cpp.o: %.cpp $(INCLUDES)
