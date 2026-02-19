@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 15:17:48 by user1             #+#    #+#             */
-/*   Updated: 2026/02/19 13:51:37 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/19 13:59:37 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ int main(int ac, char** av)
 {
 	std::signal(SIGPIPE, SIG_IGN); //socket non exist.
     std::signal(SIGINT, handle_sigint); //controlC
+    std::signal(SIGQUIT, handle_sigint); //control quit
 	
 	if (ac != 3) {
 		std::cerr << "Usage: ircserver <port> <client_password>" << std::endl;
