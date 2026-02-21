@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRCServ.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2026/02/17 19:18:48 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/19 13:47:25 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 #include <map>
 #include <sstream>
 #include <stdexcept>
+#include <csignal>
+
+extern volatile sig_atomic_t g_stop; //signal ControlC
 
 using std::strerror;
 
@@ -152,10 +155,10 @@ bool IRCServ::nickIsUnique(const std::string& n)
 
 void IRCServ::run()
 {
-    while (true) {
+    while (!g_stop) {
         int ready = epoll_wait(epoll_fd, events, 16, -1);
         if (ready == -1) {
-            if (errno == EINTR)
+            if (errno == EINTR) //when pressing ControlC no ERROR. This is vital.
                 continue;
             throw std::runtime_error(std::string("Epoll_wait: ")
                 + strerror(errno));

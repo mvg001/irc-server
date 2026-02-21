@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   answer_kick.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marcoga2 <marcoga2@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/16 15:17:10 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/17 16:45:00 by marcoga2         ###   ########.fr       */
+/*   Updated: 2026/02/17 16:36:04 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 		return ;
 	IRCClient sender = it_sender->second;
 	std::string	sender_nick = sender.getNick();
+	ft_toLower(sender_nick); 
 	
 
 	//check number of parameters
@@ -74,7 +75,8 @@ void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 		
 	//check name of the channel the kick was sent. It will be include automatically or the client can write it outside of it
 	std::vector<std::string>::const_iterator it_param = parameters.begin();
-	std::string	kick_channel_name = *it_param; 
+	std::string	kick_channel_name = *it_param;
+	ft_toLower(kick_channel_name);
 	
 	//check if the channel exist in server
 	std::map<const string, IRCChannel>& server_channels = getChannels();
@@ -117,6 +119,7 @@ void IRCServ::answer_kick(IRCMessage & msg, int fd) {
 			continue;
 		reply.str("");
 		reply.clear();
+		ft_toLower(victim); 
 		victim_mode = kick_channel.getUserMode(victim);
 		if (victim_mode != UNDEF)
 			removeClientFromChannel(parameters, sender, victim, kick_channel, *this);

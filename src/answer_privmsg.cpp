@@ -6,7 +6,7 @@
 /*   By: jrollon- <jrollon-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 17:20:21 by jrollon-          #+#    #+#             */
-/*   Updated: 2026/02/10 17:16:04 by jrollon-         ###   ########.fr       */
+/*   Updated: 2026/02/17 16:37:32 by jrollon-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,30 +37,31 @@ static void	to_user(std::vector<std::string>& msg, int fd, std::string & target,
         // the prefix
         reply << ":" << sender.getNick() << "!" << sender.getUsername() << "@" << sender.getHost() << " PRIVMSG " << target << " :";
 
-        // now the msg construction
-        std::vector<std::string>::const_iterator it_msg = msg.begin();
-        if (it_msg != msg.end())
-            it_msg++; // jump over the target to find the real msg
-
-        for (; it_msg != msg.end(); ++it_msg) {
-            reply << *it_msg;
-            if (it_msg + 1 != msg.end())
-                reply << " "; // add separator between words.
-        }
-
-        // end
-        reply << "\r\n";
-        server.queue_and_send(target_fd, reply.str());
-    }
-
-    // nick is not valid.
-    else {
-        std::string my_nick = sender.getNick();
-        if (my_nick.empty())
-            my_nick = "*";
-        reply << ":" << server.getServerName() << " 401 " << my_nick << " " << target << " :No such nick\r\n";
-        server.queue_and_send(fd, reply.str());
-    }
+		//now the msg construction
+		std::vector<std::string>::const_iterator it_msg = msg.begin();
+		if (it_msg != msg.end())
+			it_msg++; //jump over the target to find the real msg
+		
+		for (;it_msg != msg.end(); ++it_msg){
+			reply << *it_msg;
+			if (it_msg + 1 != msg.end())
+				reply << " "; //add separator between words.
+		}
+		
+		//end
+		reply << "\r\n";
+		server.queue_and_send(target_fd, reply.str());
+	}
+	
+	//nick is not valid.
+	else{
+			std::string my_nick = sender.getNick();
+			ft_toLower(my_nick);
+			if (my_nick.empty())
+				my_nick = "*";
+			reply << ":" << server.getServerName() << " 401 " << my_nick << " " << target << " :No such nick\r\n";
+			server.queue_and_send(fd, reply.str());
+	}
 }
 
 static void	to_channel(std::vector<std::string>& msg, int fd, std::string & target, IRCServ& server){
@@ -77,6 +78,7 @@ static void	to_channel(std::vector<std::string>& msg, int fd, std::string & targ
     return;    
   const IRCClient &sender = it_sender->second;
 	std::string sender_nick = sender.getNick();
+	ft_toLower(sender_nick);
 
     // 1. Search for the channel.
     std::map<const string, IRCChannel>::const_iterator it_chan = channels.find(target);
@@ -154,12 +156,12 @@ void IRCServ::answer_privmsg(IRCMessage& msg, int fd)
 
     if (clients.count(fd)) {
 
-        std::string target = msg.getParam(0);
-        ft_toLower(target);
-        std::vector<std::string> parameters = msg.getParamsVector();
-        if (!target.empty() && (target[0] == '#' || target[0] == '&' || target[0] == '+' || target[0] == '!'))
-            to_channel(parameters, fd, target, *this);
-        else if (!target.empty())
-            to_user(parameters, fd, target, *this);
-    }
+	std::string 							target = msg.getParam(0);
+	ft_toLower(target);
+	std::vector<std::string> 	parameters = msg.getParamsVector();
+	if (!target.empty() && (target[0] == '#' || target[0] == '&' || target[0] == '+' || target[0] == '!'))
+		to_channel(parameters, fd, target, *this);
+	else if (!target.empty())
+		to_user(parameters, fd, target, *this);
+	}
 }
