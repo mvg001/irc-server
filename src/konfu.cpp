@@ -226,9 +226,14 @@ int main(int ac, char* av[]) {
     }
   }
   if (receivedSignal != 0) cerr << "Received signal " << receivedSignal << endl;
-  string quitMsg = "quit :leaving, ciao\r\n";
-  if (send(sockFD,quitMsg.c_str(),quitMsg.length(),MSG_NOSIGNAL) < 0) {
-    cerr << "send quit returned < 0" << endl;
+  bool keepSending = true;
+  while (keepSending) {
+    string quitMsg = "quit :leaving, ciao\r\n";
+    if (send(sockFD,quitMsg.c_str(),quitMsg.length(),MSG_NOSIGNAL) < 0) {
+      cerr << "send quit returned < 0" << endl;
+    }
+    string line = gnl_getline(sockFD, &b);
+    keepSending = line.find(":Closing Link:") != string::npos;
   }
   // shutdown(sockFD,SHUT_WR);
   // shutdown(sockFD, SHUT_RD);
