@@ -12,11 +12,56 @@
 #include <unistd.h>
 #include <iostream>
 #include <vector>
+#include <ctime>
 
 using std::cerr;
 using std::endl;
 using std::string;
 using std::vector;
+
+typedef struct s_buf {
+  char buf[1024];
+  char *start;
+  unsigned int buffer_size;
+} t_buf;
+
+ssize_t gnl_read_buf(int fd, t_buf *rb) {
+  ssize_t nb_read;
+
+  if (fd < 0 || rb == NULL)
+    return (-1);
+  nb_read = recv(fd, rb->buf, rb->buffer_size, 0);
+  if (nb_read <= 0) {
+    rb->buf[0] = '\0';
+    rb->start = NULL;
+  } else {
+    rb->buf[nb_read] = '\0';
+    rb->start = rb->buf;
+  }
+  return (nb_read);
+}
+
+std::string gnl_getline(int fd, t_buf *rb) {
+  std::string line;
+
+  if (fd < 0 || rb == NULL || rb->buffer_size == 0)
+    return (NULL);
+  while (1) {
+    if (rb->start == NULL || *rb->start == '\0') {
+      if (gnl_read_buf(fd, rb) <= 0)
+        return (line);
+    }
+    std::string buf = rb->start;
+    size_t nlPos = buf.find_first_of('\n');
+    if (nlPos != std::string::npos) {
+        line.append(buf.substr(0, nlPos));
+        rb->start = rb->start + nlPos + 1;
+        return line;
+    }
+    line.append(buf);
+    rb->start = NULL;
+  }
+}
 
 /** Parse a string to int value using re /' '*[-]d+/
  * @param {const std::string} input
@@ -91,7 +136,7 @@ ssize_t replyPRIVMSG(string& line, const vector<string>phrases, int sockFD) {
   }
   string nick = line.substr(startPos+1,endPos-startPos-1);
   string reply = "privmsg ";
-  reply.append(nick).append(" :").append(phrases[rand() % phrases.size()])
+  reply.append(nick).append(" :").append(phrases[std::rand() % phrases.size()])
     .append("\r\n");
   return send(sockFD,reply.c_str(),reply.length(),MSG_NOSIGNAL);
 }
@@ -117,8 +162,12 @@ int main(int ac, char* av[]) {
     return 3;
   }
   cerr << "Read " << phrases.size() << " phrases" << endl;
-  srand(time(0));
+  std::srand(std::time(0));
   struct sockaddr_in serv_addr;
+
+  t_buf b;
+  b.buffer_size = 1024;
+  b.start = NULL;
 
   // Create socket
   int sockFD = socket(AF_INET, SOCK_STREAM, 0);
@@ -142,12 +191,6 @@ int main(int ac, char* av[]) {
     return 6;
   }
   // Send data
-  FILE* sockFILE = fdopen(sockFD, "r");
-  if (!sockFILE) {
-      cerr << "fdopen" << endl;
-      close(sockFD);
-      return 8;
-  }
   string msg = "pass "; 
   msg.append(pass).append("\r\n")
     .append("nick ").append(nick).append("\r\n")
@@ -157,16 +200,13 @@ int main(int ac, char* av[]) {
     cerr << "send error login" << endl;
     return 7;
   }
-  char* buf = NULL;
-  size_t lineLen = 0;
+
   installSigHandler();
   while (receivedSignal == 0) {
-    if (getline(&buf, &lineLen, sockFILE) <= 0) {
-      cerr << endl << "getline errno: " << errno << endl;
+    string line = gnl_getline(sockFD, &b);
+    if (line.empty()) {
       continue;
     }
-    string line = buf;
-    free(buf); buf = NULL;
     // :bbb!BBB@127.0.0.1 PRIVMSG aaa :hello
     if (line.find(" PRIVMSG ") != string::npos) {
       if (replyPRIVMSG(line, phrases, sockFD) < 0)
@@ -180,29 +220,19 @@ int main(int ac, char* av[]) {
       errorMsg = "FATAL: Nickname already in use";
     }
     if (!errorMsg.empty()) {
-      fclose(sockFILE);
       close(sockFD);
       cerr << errorMsg << endl;
       return 9;
     }
   }
-  free(buf);
   if (receivedSignal != 0) cerr << "Received signal " << receivedSignal << endl;
   string quitMsg = "quit :leaving, ciao\r\n";
   if (send(sockFD,quitMsg.c_str(),quitMsg.length(),MSG_NOSIGNAL) < 0) {
     cerr << "send quit returned < 0" << endl;
   }
-  shutdown(sockFD,SHUT_WR);
-  buf = NULL;
-  while (getline(&buf, &lineLen, sockFILE) > 0) {
-    cerr << buf;
-    free(buf);
-    buf = NULL;
-  }
-  free(buf);
+  // shutdown(sockFD,SHUT_WR);
+  // shutdown(sockFD, SHUT_RD);
   // Close socket
-  shutdown(sockFD, SHUT_RD);
-  fclose(sockFILE);
   close(sockFD);
   return 0;
 }

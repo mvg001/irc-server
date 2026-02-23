@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "IRCClient.hpp"
 #include "IRCServ.hpp"
 #include "utils.hpp"
 #include <iostream>
@@ -19,6 +20,18 @@ volatile sig_atomic_t g_stop = 0;
 void    handle_sigint(int sig){
     (void)sig;
     g_stop = 1;
+}
+
+static void closeAll(IRCServ& ircserver) {
+
+    std::map<int,IRCClient>::iterator it;
+    for (it = ircserver.getClients().begin(); 
+        it != ircserver.getClients().end(); ++it) {
+        close(it->first);
+    }
+    int epollFD = ircserver.getEpollFd();
+    epoll_ctl(epollFD, EPOLL_CTL_DEL, epollFD, NULL);
+    close(epollFD);
 }
 
 int main(int ac, char** av)
@@ -41,6 +54,7 @@ int main(int ac, char** av)
     try {
         IRCServ server(pairPort.first, av[2]);
         server.run();
+        closeAll(server);
     } catch (std::runtime_error& e) {
         std::cerr << e.what() << std::endl;
         return 1;
